@@ -44,7 +44,13 @@ class MainStack(Stack):
         )
 
         # Define the API Gateway
-        api = apigateway.RestApi(self, "BackOfficeApi")
+        api = apigateway.RestApi(self,
+                                 "BackOfficeApi",
+                                 default_cors_preflight_options=apigateway.CorsOptions(
+                                     allow_origins=apigateway.Cors.ALL_ORIGINS,
+                                     allow_methods=apigateway.Cors.ALL_METHODS,
+                                     allow_headers=['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key']
+                                 ))
 
         api.root.add_method("GET", apigateway.LambdaIntegration(base_path_lambda),
                             authorizer=authorizer,
