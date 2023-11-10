@@ -16,17 +16,17 @@ class MainStack(Stack):
 
         # The code that defines your stack goes here
 
-        dynamodb.Table(self, "UsersEmotionScales",
-                       partition_key=dynamodb.Attribute(
-                           name="id",
-                           type=dynamodb.AttributeType.STRING
-                       ),
-                       sort_key=dynamodb.Attribute(
-                           name="createdAt",
-                           type=dynamodb.AttributeType.NUMBER
-                       ),
-                       billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
-                       )
+        table = dynamodb.Table(self, "EmotionScalesResponseTable",
+                               partition_key=dynamodb.Attribute(
+                                   name="id",
+                                   type=dynamodb.AttributeType.STRING
+                               ),
+                               sort_key=dynamodb.Attribute(
+                                   name="createdAt",
+                                   type=dynamodb.AttributeType.NUMBER
+                               ),
+                               billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
+                               )
 
         # Instantiate the Cognito stack
         cognito_construct = CognitoConstruct(self, "CognitoConstruct")
@@ -43,16 +43,34 @@ class MainStack(Stack):
             code=lambda_.Code.from_asset("lambda"),  # Point to the directory containing your Lambda code
         )
 
+        # Define the Lambda function
+        create_user_lambda = lambda_.Function(
+            self, "CreateUser",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="create_user.handler",  # Python file: insert.py, handler function: handler
+            code=lambda_.Code.from_asset("lambda"),  # Lambda function code directory
+            environment={
+                "DYNAMODB_TABLE_NAME": table.table_name
+            }
+        )
+
+        # Grant permissions for the Lambda function to write to the DynamoDB table
+        table.grant_read_write_data(create_user_lambda)
+
         # Define the API Gateway
         api = apigateway.RestApi(self,
                                  "BackOfficeApi",
                                  default_cors_preflight_options=apigateway.CorsOptions(
                                      allow_origins=apigateway.Cors.ALL_ORIGINS,
                                      allow_methods=apigateway.Cors.ALL_METHODS,
-                                     allow_headers=['Content-Type', 'X-Amz-Date', 'Authorization', 'X-Api-Key']
+                                     allow_headers=["*"]
                                  ))
 
         api.root.add_method("GET", apigateway.LambdaIntegration(base_path_lambda),
                             authorizer=authorizer,
                             authorization_type=apigateway.AuthorizationType.COGNITO,
                             )
+
+        users = api.root.add_resource("users")
+
+        users.add_method("POST")
