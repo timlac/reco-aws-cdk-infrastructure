@@ -2,7 +2,10 @@ from aws_cdk import (
     Stack,
     aws_dynamodb as dynamodb,
     aws_apigateway as apigateway,
-    aws_lambda as lambda_
+    aws_lambda as lambda_,
+    aws_s3 as s3,
+    aws_iam as iam,
+    Duration
 )
 from constructs import Construct
 
@@ -36,25 +39,48 @@ class MainStack(Stack):
                                                            cognito_user_pools=[cognito_construct.user_pool]
                                                            )
 
+        bucket = s3.Bucket(self, "video-files-720p")
+
+        layer = lambda_.LayerVersion(
+            self, 'MyLayer',
+            code=lambda_.Code.from_asset('lambda/my-layer.zip'),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_10],
+            description='A layer containing my Python dependencies'
+        )
+
         base_path_lambda = lambda_.Function(
             self, "BasePathLambda",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="base_path.handler",  # Make sure you have a 'welcome' function in a file named 'welcome.py'
-            code=lambda_.Code.from_asset("lambda"),  # Point to the directory containing your Lambda code
+            handler="base_path.handler",
+            code=lambda_.Code.from_asset("lambda"),
         )
 
-        # Define the Lambda function
         create_user_lambda = lambda_.Function(
             self, "CreateUser",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="create_user.handler",  # Python file: insert.py, handler function: handler
-            code=lambda_.Code.from_asset("lambda"),  # Lambda function code directory
+            handler="create_user.handler",
+            code=lambda_.Code.from_asset("lambda"),
             environment={
                 "DYNAMODB_TABLE_NAME": table.table_name
-            }
+            },
+            layers=[layer]
         )
 
-        # Grant permissions for the Lambda function to write to the DynamoDB table
+        list_videos_lambda = lambda_.Function(
+            self, "ListVideos",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="list_videos.lambda_handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "BUCKET_NAME": bucket.bucket_name
+            },
+            timeout=Duration.seconds(10),
+            memory_size=512,
+            layers=[layer]
+        )
+
+        # Grant permissions for the Lambda function to write to the S3 bucket and DynamoDB table
+        bucket.grant_read(list_videos_lambda)
         table.grant_read_write_data(create_user_lambda)
 
         # Define the API Gateway
@@ -73,4 +99,14 @@ class MainStack(Stack):
 
         users = api.root.add_resource("users")
 
-        users.add_method("POST")
+        users.add_method("POST", apigateway.LambdaIntegration(create_user_lambda),
+                         authorizer=authorizer,
+                         authorization_type=apigateway.AuthorizationType.COGNITO
+                         )
+
+        videos = api.root.add_resource("videos")
+
+        videos.add_method("GET", apigateway.LambdaIntegration(list_videos_lambda),
+                          authorizer=authorizer,
+                          authorization_type=apigateway.AuthorizationType.COGNITO,
+                          )

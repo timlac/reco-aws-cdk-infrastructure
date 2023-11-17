@@ -10,7 +10,7 @@ logger = Logger()
 
 
 def handler(event, context):
-    # Retrieve data from the event
+    # Retrieve data from the event§
     data = json.loads(event["body"])
 
     # Retrieve the DynamoDB table name from the environment variables
@@ -23,7 +23,7 @@ def handler(event, context):
         response = dynamodb.put_item(
             TableName=table_name,
             Item={
-                "id": {"S": data["id"]},
+                "id": {"S": data["alias"]},
                 "createdAt": {"N": str(str(current_time))},
                 # Add other attributes here
             }
@@ -32,11 +32,19 @@ def handler(event, context):
         logger.info("Data inserted successfully: {}".format(response))
         return {
             "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True
+            },
             "body": json.dumps("Data inserted successfully")
         }
     except Exception as e:
         logger.error("Error inserting data: {}".format(str(e)))
         return {
             "statusCode": 500,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": True
+            },
             "body": json.dumps("Error inserting data")
         }
