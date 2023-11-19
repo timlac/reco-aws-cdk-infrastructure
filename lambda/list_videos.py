@@ -6,7 +6,7 @@ from aws_lambda_powertools import Logger
 logger = Logger()
 
 
-def lambda_handler(event, context):
+def handler(event, context):
     logger.info("initiating client")
 
     s3_client = boto3.client('s3')

@@ -19,17 +19,29 @@ class MainStack(Stack):
 
         # The code that defines your stack goes here
 
-        table = dynamodb.Table(self, "EmotionScalesResponseTable",
-                               partition_key=dynamodb.Attribute(
-                                   name="id",
-                                   type=dynamodb.AttributeType.STRING
-                               ),
-                               sort_key=dynamodb.Attribute(
-                                   name="createdAt",
-                                   type=dynamodb.AttributeType.NUMBER
-                               ),
-                               billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
-                               )
+        response_table = dynamodb.Table(self, "EmotionScalesResponseTable",
+                                        partition_key=dynamodb.Attribute(
+                                            name="id",
+                                            type=dynamodb.AttributeType.STRING
+                                        ),
+                                        sort_key=dynamodb.Attribute(
+                                            name="createdAt",
+                                            type=dynamodb.AttributeType.NUMBER
+                                        ),
+                                        billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
+                                        )
+
+        video_table = dynamodb.Table(self, "VideoMetadataTable",
+                                     partition_key=dynamodb.Attribute(
+                                         name="filename",
+                                         type=dynamodb.AttributeType.STRING
+                                     ),
+                                     sort_key=dynamodb.Attribute(
+                                         name="video_id",
+                                         type=dynamodb.AttributeType.NUMBER
+                                     ),
+                                     billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
+                                     )
 
         # Instantiate the Cognito stack
         cognito_construct = CognitoConstruct(self, "CognitoConstruct")
@@ -61,7 +73,7 @@ class MainStack(Stack):
             handler="create_user.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
-                "DYNAMODB_TABLE_NAME": table.table_name
+                "DYNAMODB_TABLE_NAME": response_table.table_name
             },
             layers=[layer]
         )
@@ -69,7 +81,7 @@ class MainStack(Stack):
         list_videos_lambda = lambda_.Function(
             self, "ListVideos",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="list_videos.lambda_handler",
+            handler="list_videos.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
                 "BUCKET_NAME": bucket.bucket_name
@@ -79,9 +91,20 @@ class MainStack(Stack):
             layers=[layer]
         )
 
+        get_users_lambda = lambda_.Function(
+            self, "GetUsers",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="get_users.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": response_table.table_name
+            }
+        )
+
         # Grant permissions for the Lambda function to write to the S3 bucket and DynamoDB table
         bucket.grant_read(list_videos_lambda)
-        table.grant_read_write_data(create_user_lambda)
+        response_table.grant_read_write_data(create_user_lambda)
+        response_table.grant_read_data(get_users_lambda)
 
         # Define the API Gateway
         api = apigateway.RestApi(self,
@@ -100,6 +123,11 @@ class MainStack(Stack):
         users = api.root.add_resource("users")
 
         users.add_method("POST", apigateway.LambdaIntegration(create_user_lambda),
+                         authorizer=authorizer,
+                         authorization_type=apigateway.AuthorizationType.COGNITO
+                         )
+
+        users.add_method("GET", apigateway.LambdaIntegration(get_users_lambda),
                          authorizer=authorizer,
                          authorization_type=apigateway.AuthorizationType.COGNITO
                          )
