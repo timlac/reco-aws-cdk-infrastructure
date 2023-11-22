@@ -48,7 +48,8 @@ def handler(event, context):
                 "items": {"L": items_with_attributes},
                 "createdAt": {"N": str(str(current_time))},
                 # Add other attributes here
-            }
+            },
+            ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist
         )
 
         logger.info("Data inserted successfully: {}".format(response))

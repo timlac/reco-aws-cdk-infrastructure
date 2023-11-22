@@ -24,10 +24,6 @@ class MainStack(Stack):
                                             name="id",
                                             type=dynamodb.AttributeType.STRING
                                         ),
-                                        sort_key=dynamodb.Attribute(
-                                            name="createdAt",
-                                            type=dynamodb.AttributeType.NUMBER
-                                        ),
                                         billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
                                         )
 
@@ -35,10 +31,6 @@ class MainStack(Stack):
                                      partition_key=dynamodb.Attribute(
                                          name="filename",
                                          type=dynamodb.AttributeType.STRING
-                                     ),
-                                     sort_key=dynamodb.Attribute(
-                                         name="video_id",
-                                         type=dynamodb.AttributeType.NUMBER
                                      ),
                                      billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
                                      )
@@ -91,6 +83,18 @@ class MainStack(Stack):
             layers=[layer]
         )
 
+        get_videos_lambda = lambda_.Function(
+            self, "GetVideos",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="get_videos.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": video_table.table_name
+            },
+            memory_size=512,
+            layers=[layer]
+        )
+
         get_users_lambda = lambda_.Function(
             self, "GetUsers",
             runtime=lambda_.Runtime.PYTHON_3_10,
@@ -98,13 +102,17 @@ class MainStack(Stack):
             code=lambda_.Code.from_asset("lambda"),
             environment={
                 "DYNAMODB_TABLE_NAME": response_table.table_name
-            }
+            },
+            memory_size=512,
+            layers=[layer]
         )
 
         # Grant permissions for the Lambda function to write to the S3 bucket and DynamoDB table
         bucket.grant_read(list_videos_lambda)
         response_table.grant_read_write_data(create_user_lambda)
         response_table.grant_read_data(get_users_lambda)
+
+        video_table.grant_read_data(get_videos_lambda)
 
         # Define the API Gateway
         api = apigateway.RestApi(self,
@@ -134,7 +142,7 @@ class MainStack(Stack):
 
         videos = api.root.add_resource("videos")
 
-        videos.add_method("GET", apigateway.LambdaIntegration(list_videos_lambda),
+        videos.add_method("GET", apigateway.LambdaIntegration(get_videos_lambda),
                           authorizer=authorizer,
                           authorization_type=apigateway.AuthorizationType.COGNITO,
                           )

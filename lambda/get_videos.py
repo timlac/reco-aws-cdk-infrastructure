@@ -1,12 +1,7 @@
 import boto3
 import json
 import os
-from aws_lambda_powertools import Logger
-
-
 from serializer import to_serializable
-
-logger = Logger()
 
 
 def handler(event, context):
@@ -18,11 +13,9 @@ def handler(event, context):
     table = dynamodb.Table(table_name)
 
     try:
-        logger.info("scanning table")
         # Scan table to retrieve all users
-        response = table.scan()
+        response = table.scan(Limit=800)
         items = response.get('Items', [])
-        logger.info("retrieved items")
 
         return {
             'statusCode': 200,
@@ -37,5 +30,9 @@ def handler(event, context):
         print(e)
         return {
             'statusCode': 500,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True
+            },
             'body': json.dumps(str(e))
         }
