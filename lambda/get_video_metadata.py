@@ -1,4 +1,6 @@
 import boto3
+from boto3.dynamodb.conditions import Attr
+
 import json
 import os
 from serializer import to_serializable
@@ -14,7 +16,9 @@ def handler(event, context):
 
     try:
         # Scan table to retrieve all users
-        response = table.scan(Limit=800)
+        response = table.scan(
+            FilterExpression=Attr("sex").eq("m") & Attr("intensity_level").eq(3)
+        )
         items = response.get('Items', [])
 
         return {
