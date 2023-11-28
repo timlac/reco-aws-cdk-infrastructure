@@ -12,55 +12,20 @@ from constructs import Construct
 from .cognito_construct import CognitoConstruct
 
 
+from .emotion_scales_stack import EmotionScalesStack
+from .emotion_categories_stack import EmotionCategoriesStack
+from .shared_resources_stack import SharedResourcesStack
+from .video_metadata_stack import VideoMetadataStack
+
+
 class MainStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # The code that defines your stack goes here
-
-        response_table_emotion_scales = dynamodb.Table(self, "EmotionScalesResponseTable",
-                                                       partition_key=dynamodb.Attribute(
-                                                           name="id",
-                                                           type=dynamodb.AttributeType.STRING
-                                                       ),
-                                                       billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-                                                       # or PROVISIONED
-                                                       )
-
-        response_table_emotion_categories = dynamodb.Table(self, "EmotionCategoriesResponseTable",
-                                                           partition_key=dynamodb.Attribute(
-                                                               name="id",
-                                                               type=dynamodb.AttributeType.STRING
-                                                           ),
-                                                           billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-                                                           # or PROVISIONED
-                                                           )
-
-        video_metadata_table = dynamodb.Table(self, "VideoMetadataTable",
-                                              partition_key=dynamodb.Attribute(
-                                                  name="filename",
-                                                  type=dynamodb.AttributeType.STRING
-                                              ),
-                                              billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
-                                              )
-
-        # Instantiate the Cognito stack
-        cognito_construct = CognitoConstruct(self, "CognitoConstruct")
-
-        # Create an authorizer linked to the Cognito User Pool
-        authorizer = apigateway.CognitoUserPoolsAuthorizer(self, "CognitoAuthorizer",
-                                                           cognito_user_pools=[cognito_construct.user_pool]
-                                                           )
-
         bucket = s3.Bucket(self, "video-files-720p")
 
-        layer = lambda_.LayerVersion(
-            self, 'MyLayer',
-            code=lambda_.Code.from_asset('lambda/my-layer.zip'),
-            compatible_runtimes=[lambda_.Runtime.PYTHON_3_10],
-            description='A layer containing my Python dependencies'
-        )
+        shared_resources = SharedResourcesStack(self, "SharedResources")
 
         base_path_lambda = lambda_.Function(
             self, "BasePathLambda",
@@ -68,46 +33,6 @@ class MainStack(Stack):
             handler="base_path.handler",
             code=lambda_.Code.from_asset("lambda"),
         )
-
-        create_user_lambda = lambda_.Function(
-            self, "CreateUser",
-            runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="create_user.handler",
-            code=lambda_.Code.from_asset("lambda"),
-            environment={
-                "DYNAMODB_TABLE_NAME": response_table_emotion_scales.table_name
-            },
-            layers=[layer]
-        )
-
-        get_users_lambda = lambda_.Function(
-            self, "GetUsers",
-            runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="get_users.handler",
-            code=lambda_.Code.from_asset("lambda"),
-            environment={
-                "DYNAMODB_TABLE_NAME": response_table_emotion_scales.table_name
-            },
-            memory_size=512,
-            layers=[layer]
-        )
-
-        get_videos_lambda = lambda_.Function(
-            self, "GetVideoMetadata",
-            runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="get_video_metadata.handler",
-            code=lambda_.Code.from_asset("lambda"),
-            environment={
-                "DYNAMODB_TABLE_NAME": video_metadata_table.table_name
-            },
-            memory_size=512,
-            layers=[layer]
-        )
-
-        response_table_emotion_scales.grant_read_write_data(create_user_lambda)
-        response_table_emotion_scales.grant_read_data(get_users_lambda)
-
-        video_metadata_table.grant_read_data(get_videos_lambda)
 
         # Define the API Gateway
         api = apigateway.RestApi(self,
@@ -123,21 +48,21 @@ class MainStack(Stack):
                             authorization_type=apigateway.AuthorizationType.COGNITO,
                             )
 
-        users = api.root.add_resource("users")
+        emotion_scales_stack = EmotionScalesStack(self,
+                                                  "EmotionScalesStack",
+                                                  authorizer=authorizer,
+                                                  layer_arn=shared_resources.lambda_layer_arn,
+                                                  api=api)
 
-        users.add_method("POST", apigateway.LambdaIntegration(create_user_lambda),
-                         authorizer=authorizer,
-                         authorization_type=apigateway.AuthorizationType.COGNITO
-                         )
+        emotion_categories_stack = EmotionCategoriesStack(self,
+                                                          "EmotionCategoriesStack",
+                                                          authorizer=authorizer,
+                                                          layer_arn=shared_resources.lambda_layer_arn,
+                                                          api=api)
 
-        users.add_method("GET", apigateway.LambdaIntegration(get_users_lambda),
-                         authorizer=authorizer,
-                         authorization_type=apigateway.AuthorizationType.COGNITO
-                         )
+        video_metadata_stack = VideoMetadataStack(self,
+                                                  "VideoMetadataStack",
+                                                  authorizer=authorizer,
+                                                  layer_arn=shared_resources.lambda_layer_arn,
+                                                  api=api)
 
-        video_metadata = api.root.add_resource("video_metadata")
-
-        video_metadata.add_method("GET", apigateway.LambdaIntegration(get_videos_lambda),
-                                  authorizer=authorizer,
-                                  authorization_type=apigateway.AuthorizationType.COGNITO,
-                                  )
