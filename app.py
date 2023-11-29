@@ -3,26 +3,20 @@ import os
 
 import aws_cdk as cdk
 
-from main_stack.main_stack import MainStack
-
+from stacks.main_stack import MainStack
+from stacks.shared_resources_stack import SharedResourcesStack
+from stacks.emotion_scales_stack import EmotionScalesStack
+from stacks.emotion_categories_stack import EmotionCategoriesStack
+from stacks.video_metadata_stack import VideoMetadataStack
 
 app = cdk.App()
-MainStack(app, "MainStack",
-          # If you don't specify 'env', this stack will be environment-agnostic.
-          # Account/Region-dependent features and context lookups will not work,
-          # but a single synthesized template can be deployed anywhere.
 
-          # Uncomment the next line to specialize this stack for the AWS Account
-          # and Region that are implied by the current CLI configuration.
+shared_resources = SharedResourcesStack(app, "SharedResourcesStack")
 
-          #env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
+MainStack(app, "MainStack", shared_resources)
 
-          # Uncomment the next line if you know exactly what Account and Region you
-          # want to deploy the stack to. */
-
-          #env=cdk.Environment(account='123456789012', region='us-east-1'),
-
-          # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-          )
+EmotionScalesStack(app, "EmotionScalesStack", shared_resources)
+EmotionCategoriesStack(app, "EmotionCategoriesStack", shared_resources)
+VideoMetadataStack(app, "VideoMetadataStack", shared_resources)
 
 app.synth()

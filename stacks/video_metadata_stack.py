@@ -3,6 +3,7 @@ from aws_cdk import (
     aws_dynamodb as dynamodb,
     aws_apigateway as apigateway,
     aws_lambda as lambda_,
+    Fn
 )
 from constructs import Construct
 
@@ -12,11 +13,13 @@ class VideoMetadataStack(Stack):
     def __init__(self,
                  scope: Construct,
                  construct_id: str,
-                 authorizer: apigateway.CognitoUserPoolsAuthorizer,
-                 layer_arn: lambda_.LayerVersion,
-                 api: apigateway.RestApi,
+                 shared_resources,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
+
+        layer_arn = Fn.import_value("DependencyLayerArn")
+        api = shared_resources.api
+        authorizer = shared_resources.authorizer
 
         video_metadata_table = dynamodb.Table(self, "VideoMetadataTable",
                                               partition_key=dynamodb.Attribute(

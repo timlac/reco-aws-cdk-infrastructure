@@ -1,10 +1,10 @@
 import aws_cdk as core
 import aws_cdk.assertions as assertions
 
-from main_stack.main_stack import MainStack
+from stacks.main_stack import MainStack
 
 # example tests. To run these tests, uncomment this file along with the example
-# resource in main_stack/main_stack.py
+# resource in stacks/stacks.py
 def test_sqs_queue_created():
     app = core.App()
     stack = MainStack(app, "reco-emotion-scales-aws-cdk-infrastructure")
