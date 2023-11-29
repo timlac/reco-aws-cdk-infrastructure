@@ -17,7 +17,7 @@ class EmotionScalesStack(Stack):
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        layer_arn = Fn.import_value("DependencyLayerArn")
+        layer = shared_resources.lambda_layer
         api = shared_resources.api
         authorizer = shared_resources.authorizer
 
@@ -28,8 +28,6 @@ class EmotionScalesStack(Stack):
                                         ),
                                         billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
                                         )
-
-        layer = lambda_.LayerVersion.from_layer_version_arn(self, "ImportedLayer", layer_arn)
 
         create_user_lambda = lambda_.Function(
             self, "CreateUserEmotionScales",
