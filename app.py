@@ -3,6 +3,7 @@ import os
 
 import aws_cdk as cdk
 
+from stacks.api_stack import ApiStack
 from stacks.main_stack import MainStack
 from stacks.lambda_layer_stack import LambdaLayerStack
 from stacks.emotion_scales_stack import EmotionScalesStack
@@ -11,12 +12,14 @@ from stacks.video_metadata_stack import VideoMetadataStack
 
 app = cdk.App()
 
-shared_resources = LambdaLayerStack(app, "SharedResourcesStack")
+lambda_layer_stack = LambdaLayerStack(app, "LambdaLayerStack")
 
-# MainStack(app, "MainStack", shared_resources)
+api_stack = ApiStack(app, "ApiStack")
 
-EmotionScalesStack(app, "EmotionScalesStack", shared_resources)
-# EmotionCategoriesStack(app, "EmotionCategoriesStack", shared_resources)
-# VideoMetadataStack(app, "VideoMetadataStack", shared_resources)
+MainStack(app, "MainStack", api_stack)
+
+EmotionScalesStack(app, "EmotionScalesStack", api_stack, lambda_layer_stack)
+EmotionCategoriesStack(app, "EmotionCategoriesStack", api_stack, lambda_layer_stack)
+VideoMetadataStack(app, "VideoMetadataStack", api_stack, lambda_layer_stack)
 
 app.synth()

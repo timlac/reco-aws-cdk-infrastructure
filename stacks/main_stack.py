@@ -1,11 +1,8 @@
 from aws_cdk import (
     Stack,
-    aws_dynamodb as dynamodb,
     aws_apigateway as apigateway,
     aws_lambda as lambda_,
     aws_s3 as s3,
-    aws_iam as iam,
-    Duration
 )
 from constructs import Construct
 

@@ -13,13 +13,17 @@ class EmotionScalesStack(Stack):
     def __init__(self,
                  scope: Construct,
                  construct_id: str,
-                 shared_resources,
+                 api_stack,
+                 lambda_layer_stack,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        layer = shared_resources.lambda_layer
-        api = shared_resources.api
-        authorizer = shared_resources.authorizer
+        # layer_arn = Fn.import_value("DependencyLayerArn")
+        # layer = lambda_.LayerVersion.from_layer_version_arn(self, "ImportedLayer", layer_arn)
+
+        layer = lambda_layer_stack.lambda_layer
+        api = api_stack.api
+        authorizer = api_stack.authorizer
 
         response_table = dynamodb.Table(self, "EmotionScalesResponseTable",
                                         partition_key=dynamodb.Attribute(

@@ -13,13 +13,15 @@ class EmotionCategoriesStack(Stack):
     def __init__(self,
                  scope: Construct,
                  construct_id: str,
-                 shared_resources,
+                 api_stack,
+                 lambda_layer_stack,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        layer_arn = Fn.import_value("DependencyLayerArn")
-        api = shared_resources.api
-        authorizer = shared_resources.authorizer
+        layer = lambda_layer_stack.lambda_layer
+
+        api = api_stack.api
+        authorizer = api_stack.authorizer
 
         response_table = dynamodb.Table(self, "EmotionCategoriesResponseTable",
                                         partition_key=dynamodb.Attribute(
@@ -28,8 +30,6 @@ class EmotionCategoriesStack(Stack):
                                         ),
                                         billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
                                         )
-
-        layer = lambda_.LayerVersion.from_layer_version_arn(self, "ImportedLayer", layer_arn)
 
         # This function needs to be adapted for each api
         create_user_lambda = lambda_.Function(

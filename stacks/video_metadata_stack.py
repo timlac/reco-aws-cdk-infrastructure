@@ -13,13 +13,13 @@ class VideoMetadataStack(Stack):
     def __init__(self,
                  scope: Construct,
                  construct_id: str,
-                 shared_resources,
+                 api_stack,
+                 lambda_layer_stack,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        layer_arn = Fn.import_value("DependencyLayerArn")
-        api = shared_resources.api
-        authorizer = shared_resources.authorizer
+        api = api_stack.api
+        authorizer = api_stack.authorizer
 
         video_metadata_table = dynamodb.Table(self, "VideoMetadataTable",
                                               partition_key=dynamodb.Attribute(
@@ -29,7 +29,7 @@ class VideoMetadataStack(Stack):
                                               billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
                                               )
 
-        layer = lambda_.LayerVersion.from_layer_version_arn(self, "ImportedLayer", layer_arn)
+        layer = lambda_layer_stack.lambda_layer
 
         get_videos_lambda = lambda_.Function(
             self, "GetVideoMetadata",
