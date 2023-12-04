@@ -17,6 +17,10 @@ def handler(event, context):
     table_name = os.environ['DYNAMODB_TABLE_NAME']
     table = dynamodb.Table(table_name)
 
+    logger.info("table:")
+    logger.info(table_name)
+    logger.info(table)
+
     try:
         logger.info("scanning table")
         # Scan table to retrieve all users

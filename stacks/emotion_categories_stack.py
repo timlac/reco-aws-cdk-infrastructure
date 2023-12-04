@@ -7,21 +7,38 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+from stacks.cognito_construct import CognitoConstruct
+
 
 class EmotionCategoriesStack(Stack):
 
     def __init__(self,
                  scope: Construct,
                  construct_id: str,
-                 api_stack,
-                 lambda_layer_stack,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        layer = lambda_layer_stack.lambda_layer
+        layer = lambda_.LayerVersion(
+            self, 'DependencyLayer',
+            code=lambda_.Code.from_asset('lambda/my-layer.zip'),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_10],
+            description='A layer containing my Python dependencies'
+        )
 
-        api = api_stack.api
-        authorizer = api_stack.authorizer
+        # Instantiate the Cognito stack
+        cognito_construct = CognitoConstruct(self, "CognitoConstruct")
+
+        # Create an authorizer linked to the Cognito User Pool
+        authorizer = apigateway.CognitoUserPoolsAuthorizer(self, "CognitoAuthorizer",
+                                                           cognito_user_pools=[cognito_construct.user_pool])
+
+        api = apigateway.RestApi(self,
+                                 "EmotionCategoriesApi",
+                                 default_cors_preflight_options=apigateway.CorsOptions(
+                                     allow_origins=apigateway.Cors.ALL_ORIGINS,
+                                     allow_methods=apigateway.Cors.ALL_METHODS,
+                                     allow_headers=["*"]
+                                 ))
 
         table = dynamodb.Table(self, "EmotionCategoriesResponseTable",
                                partition_key=dynamodb.Attribute(
@@ -36,7 +53,7 @@ class EmotionCategoriesStack(Stack):
             self, "CreateUserEmotionCategories",
             runtime=lambda_.Runtime.PYTHON_3_10,
             handler="create_emotion_categories_user.handler",
-            code=lambda_.Code.from_asset("lambda"),
+            code=lambda_.Code.from_asset("lambda/emotion_categories"),
             environment={
                 "DYNAMODB_TABLE_NAME": table.table_name
             },
@@ -47,7 +64,7 @@ class EmotionCategoriesStack(Stack):
         get_users_lambda = lambda_.Function(
             self, "GetUsersEmotionCategories",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="get_user.handler",
+            handler="get_users.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
                 "DYNAMODB_TABLE_NAME": table.table_name
@@ -65,7 +82,6 @@ class EmotionCategoriesStack(Stack):
             environment={
                 "DYNAMODB_TABLE_NAME": table.table_name
             },
-            memory_size=512,
             layers=[layer]
         )
 
@@ -73,7 +89,7 @@ class EmotionCategoriesStack(Stack):
         table.grant_read_data(get_users_lambda)
         table.grant_read_data(get_specific_user_lambda)
 
-        emotion_scales_users = api.root.add_resource("emotion_categories_users")
+        emotion_scales_users = api.root.add_resource("users")
 
         # backoffice endpoints
         emotion_scales_users.add_method("POST", apigateway.LambdaIntegration(create_user_lambda),

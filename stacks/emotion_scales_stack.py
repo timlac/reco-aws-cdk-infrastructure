@@ -7,23 +7,39 @@ from aws_cdk import (
 )
 from constructs import Construct
 
+from stacks.cognito_construct import CognitoConstruct
+
 
 class EmotionScalesStack(Stack):
 
     def __init__(self,
                  scope: Construct,
                  construct_id: str,
-                 api_stack,
-                 lambda_layer_stack,
+
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # layer_arn = Fn.import_value("DependencyLayerArn")
-        # layer = lambda_.LayerVersion.from_layer_version_arn(self, "ImportedLayer", layer_arn)
+        layer = lambda_.LayerVersion(
+            self, 'DependencyLayer',
+            code=lambda_.Code.from_asset('lambda/my-layer.zip'),
+            compatible_runtimes=[lambda_.Runtime.PYTHON_3_10],
+            description='A layer containing my Python dependencies'
+        )
 
-        layer = lambda_layer_stack.lambda_layer
-        api = api_stack.api
-        authorizer = api_stack.authorizer
+        # Instantiate the Cognito stack
+        cognito_construct = CognitoConstruct(self, "CognitoConstruct")
+
+        # Create an authorizer linked to the Cognito User Pool
+        authorizer = apigateway.CognitoUserPoolsAuthorizer(self, "CognitoAuthorizer",
+                                                           cognito_user_pools=[cognito_construct.user_pool])
+
+        api = apigateway.RestApi(self,
+                                 "EmotionScalesApi",
+                                 default_cors_preflight_options=apigateway.CorsOptions(
+                                     allow_origins=apigateway.Cors.ALL_ORIGINS,
+                                     allow_methods=apigateway.Cors.ALL_METHODS,
+                                     allow_headers=["*"]
+                                 ))
 
         response_table = dynamodb.Table(self, "EmotionScalesResponseTable",
                                         partition_key=dynamodb.Attribute(
