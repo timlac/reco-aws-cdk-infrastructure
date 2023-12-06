@@ -6,8 +6,7 @@ from aws_cdk import (
     Fn
 )
 from constructs import Construct
-
-from stacks.cognito_construct import CognitoConstruct
+from aws_cdk.aws_cognito import UserPool
 
 
 class EmotionScalesStack(Stack):
@@ -19,19 +18,19 @@ class EmotionScalesStack(Stack):
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        # Import the existing User Pool
+        user_pool = UserPool.from_user_pool_id(self, "ImportedUserPool", "insert user pool id")
+
+        # Create an authorizer linked to the Cognito User Pool
+        authorizer = apigateway.CognitoUserPoolsAuthorizer(self, "CognitoAuthorizer",
+                                                           cognito_user_pools=[user_pool])
+
         layer = lambda_.LayerVersion(
             self, 'DependencyLayer',
             code=lambda_.Code.from_asset('lambda/my-layer.zip'),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_10],
             description='A layer containing my Python dependencies'
         )
-
-        # Instantiate the Cognito stack
-        cognito_construct = CognitoConstruct(self, "CognitoConstruct")
-
-        # Create an authorizer linked to the Cognito User Pool
-        authorizer = apigateway.CognitoUserPoolsAuthorizer(self, "CognitoAuthorizer",
-                                                           cognito_user_pools=[cognito_construct.user_pool])
 
         api = apigateway.RestApi(self,
                                  "EmotionScalesApi",

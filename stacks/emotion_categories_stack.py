@@ -6,8 +6,7 @@ from aws_cdk import (
     Fn
 )
 from constructs import Construct
-
-from stacks.cognito_construct import CognitoConstruct
+from aws_cdk.aws_cognito import UserPool
 
 
 class EmotionCategoriesStack(Stack):
@@ -25,12 +24,14 @@ class EmotionCategoriesStack(Stack):
             description='A layer containing my Python dependencies'
         )
 
-        # Instantiate the Cognito stack
-        cognito_construct = CognitoConstruct(self, "CognitoConstruct")
+        user_pool_id = self.node.try_get_context("userPoolId")
+
+        # Import the existing User Pool
+        user_pool = UserPool.from_user_pool_id(self, "ImportedUserPool", user_pool_id)
 
         # Create an authorizer linked to the Cognito User Pool
         authorizer = apigateway.CognitoUserPoolsAuthorizer(self, "CognitoAuthorizer",
-                                                           cognito_user_pools=[cognito_construct.user_pool])
+                                                           cognito_user_pools=[user_pool])
 
         api = apigateway.RestApi(self,
                                  "EmotionCategoriesApi",
@@ -52,8 +53,8 @@ class EmotionCategoriesStack(Stack):
         create_user_lambda = lambda_.Function(
             self, "CreateUserEmotionCategories",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="create_emotion_categories_user.handler",
-            code=lambda_.Code.from_asset("lambda/emotion_categories"),
+            handler="emotion_categories.create_user.handler",
+            code=lambda_.Code.from_asset("lambda"),
             environment={
                 "DYNAMODB_TABLE_NAME": table.table_name
             },

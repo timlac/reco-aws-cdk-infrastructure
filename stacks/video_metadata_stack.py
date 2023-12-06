@@ -7,7 +7,7 @@ from aws_cdk import (
 )
 from constructs import Construct
 
-from stacks.cognito_construct import CognitoConstruct
+from aws_cdk.aws_cognito import UserPool
 
 
 class VideoMetadataStack(Stack):
@@ -18,19 +18,21 @@ class VideoMetadataStack(Stack):
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
+        user_pool_id = self.node.try_get_context("userPoolId")
+
+        # Import the existing User Pool
+        user_pool = UserPool.from_user_pool_id(self, "ImportedUserPool", user_pool_id)
+
+        # Create an authorizer linked to the Cognito User Pool
+        authorizer = apigateway.CognitoUserPoolsAuthorizer(self, "CognitoAuthorizer",
+                                                           cognito_user_pools=[user_pool])
+
         layer = lambda_.LayerVersion(
             self, 'DependencyLayer',
             code=lambda_.Code.from_asset('lambda/my-layer.zip'),
             compatible_runtimes=[lambda_.Runtime.PYTHON_3_10],
             description='A layer containing my Python dependencies'
         )
-
-        # Instantiate the Cognito stack
-        cognito_construct = CognitoConstruct(self, "CognitoConstruct")
-
-        # Create an authorizer linked to the Cognito User Pool
-        authorizer = apigateway.CognitoUserPoolsAuthorizer(self, "CognitoAuthorizer",
-                                                           cognito_user_pools=[cognito_construct.user_pool])
 
         api = apigateway.RestApi(self,
                                  "VideoMetaDataApi",
@@ -40,27 +42,27 @@ class VideoMetadataStack(Stack):
                                      allow_headers=["*"]
                                  ))
 
-        video_metadata_table = dynamodb.Table(self, "VideoMetadataTable",
-                                              partition_key=dynamodb.Attribute(
-                                                  name="filename",
-                                                  type=dynamodb.AttributeType.STRING
-                                              ),
-                                              billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
-                                              )
+        table = dynamodb.Table(self, "VideoMetadataTable",
+                               partition_key=dynamodb.Attribute(
+                                   name="filename",
+                                   type=dynamodb.AttributeType.STRING
+                               ),
+                               billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,  # or PROVISIONED
+                               )
 
         get_videos_lambda = lambda_.Function(
             self, "GetVideoMetadata",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="get_all.handler",
-            code=lambda_.Code.from_asset("lambda/video_metadata"),
+            handler="get_video_metadata.handler",
+            code=lambda_.Code.from_asset("lambda"),
             environment={
-                "DYNAMODB_TABLE_NAME": video_metadata_table.table_name
+                "DYNAMODB_TABLE_NAME": table.table_name
             },
             memory_size=512,
             layers=[layer]
         )
 
-        video_metadata_table.grant_read_data(get_videos_lambda)
+        table.grant_read_data(get_videos_lambda)
 
         video_metadata = api.root.add_resource("videos")
 

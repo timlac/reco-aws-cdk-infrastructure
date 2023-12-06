@@ -17,8 +17,9 @@ def handler(event, context):
 
     user_id = event['pathParameters']['userId']
 
-    logger.info("user id:")
-    logger.info(user_id)
+    logger.info("event['pathParameters']: ", event['pathParameters'])
+
+    logger.info("user id: ", user_id)
 
     # Retrieve the DynamoDB table name from the environment variables
     table_name = os.environ['DYNAMODB_TABLE_NAME']
@@ -43,5 +44,9 @@ def handler(event, context):
         print(e)
         return {
             'statusCode': 500,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True
+            },
             'body': json.dumps(str(e))
         }

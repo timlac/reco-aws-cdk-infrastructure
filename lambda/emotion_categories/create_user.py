@@ -26,7 +26,10 @@ def handler(event, context):
     # Retrieve data from the event
     data = json.loads(event["body"])
 
-    logger.info("logging data items")
+    logger.info("logging data:")
+    logger.info(data)
+
+    logger.info("logging data items:")
     logger.info(data["items"])
 
     # Retrieve the DynamoDB table name from the environment variables
@@ -34,6 +37,7 @@ def handler(event, context):
 
     # Convert the list of items into the DynamoDB L type
     items_with_attributes = [format_item(item) for item in data["items"]]
+    emotion_alternatives = [{"S": emotion_id} for emotion_id in data["emotion_alternatives"]]
 
     logger.info("post attribute adding")
     logger.info(items_with_attributes)
@@ -46,6 +50,8 @@ def handler(event, context):
             Item={
                 "id": {"S": data["alias"]},
                 "items": {"L": items_with_attributes},
+                "emotion_alternatives": {"L": emotion_alternatives},
+                "valence": {"S": data["valence"]},
                 "createdAt": {"N": str(str(current_time))},
                 # Add other attributes here
             },

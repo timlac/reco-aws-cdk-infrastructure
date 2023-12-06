@@ -3,7 +3,7 @@ from boto3.dynamodb.conditions import Attr
 
 import json
 import os
-from ..serializer import to_serializable
+from serializer import to_serializable
 
 
 def handler(event, context):

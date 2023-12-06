@@ -1,14 +1,14 @@
 from aws_cdk import (
+    Stack,
     aws_cognito as cognito,
     CfnOutput
 )
-
 from constructs import Construct
 
 
-class CognitoConstruct(Construct):
+class CognitoStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
-        super().__init__(scope, construct_id)
+        super().__init__(scope, construct_id, **kwargs)
 
         # Create a new Cognito User Pool
         self.user_pool = cognito.UserPool(self, "BackOfficeUserPool",
