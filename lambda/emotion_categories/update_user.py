@@ -1,37 +1,122 @@
-# import boto3
-# import json
-#
-#
-# # TODO: TO BE MODIFIED
-#
-# data = json.loads(event["body"])
-#
-# # Initialize DynamoDB client
-# dynamodb = boto3.client('dynamodb')
-#
-# # Specify your table name
-# table_name = 'your-table-name'
-#
-# # User ID (primary key) associated with the items
-# user_id = 'your-user-id'
-#
-# # Step 1: Verify user identity/authentication (e.g., user authentication token)
-#
-# # Step 2: Retrieve existing user's data
-# response = dynamodb.get_item(
-#     TableName=table_name,
-#     Key={'id': {'S': user_id}}
-# )
-#
-# # Check if the user exists
-# if 'Item' in response:
-#     # Step 3: User exists, proceed with the update
-#     # Update the item in DynamoDB
-#     dynamodb.put_item(
-#         TableName=table_name,
-#         Item=data
-#     )
-#     print("Item updated successfully.")
-# else:
-#     # Step 4: User doesn't exist, reject the request
-#     print("User not found. Update request rejected.")
+import os
+import json
+import boto3
+import time  # Import the time module
+from aws_lambda_powertools import Logger
+
+# Initialize the AWS SDK clients
+dynamodb = boto3.resource('dynamodb')
+logger = Logger()
+
+headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Credentials": True
+}
+
+
+def get_response_404(message):
+    return {
+        "statusCode": 404,
+        "headers": headers,
+        "body": json.dumps(message)
+    }
+
+
+def item_has_reply(has_reply):
+    print("has_reply", has_reply)
+
+    if has_reply == 1:
+        return True
+    elif has_reply == 0:
+        return False
+    else:
+        raise Exception("Error: Something went wrong, has_reply is {}".format(has_reply))
+
+
+def handler(event, context):
+    # User ID (primary key) associated with the items
+    user_id = event['pathParameters']['userId']
+
+    logger.info(user_id)
+
+    data = json.loads(event["body"])
+    filename = data['filename']
+    reply = data['reply']
+
+    logger.info(data)
+
+    logger.info(filename)
+    logger.info(reply)
+
+    # Retrieve the DynamoDB table name from the environment variables
+    table_name = os.environ['DYNAMODB_TABLE_NAME']
+    table = dynamodb.Table(table_name)
+
+    logger.info(table_name)
+    logger.info(table)
+
+    # Step 2: Retrieve existing user's data
+    response = table.get_item(
+        Key={'id': user_id}
+    )
+
+    logger.info("response")
+    logger.info(response)
+
+    # Check if the user exists (Item is native DynamoDB)
+    if 'Item' not in response:
+        return get_response_404('Error: user {user_id} does not exist'.format(user_id=user_id))
+
+    dynamo_item = response['Item']
+    update_idx = None
+
+    # items the user attribute for filename we seek user replies for
+    for idx, item in enumerate(dynamo_item['user_items']):
+
+        logger.info("idx: {}".format(idx))
+
+        logger.info("item: {}".format(item))
+
+        logger.info("item[filename] {}".format(item["filename"]))
+        logger.info("filename {}".format(filename))
+
+        if item['filename'] == filename:
+
+            logger.info("filename match found")
+
+            if item_has_reply(item['has_reply']):
+                return get_response_404("Error: Reply already exists on user item.")
+
+            logger.info("setting reply")
+
+            item['reply'] = reply
+            update_idx = idx
+
+            logger.info("update idx: {}".format(update_idx))
+
+    if update_idx is None:
+        return get_response_404("Error: Filename {} not found...".format(filename))
+
+    try:
+        table.update_item(
+            Key={'id': user_id},
+            UpdateExpression=f'SET user_items[{update_idx}].reply = :val, '
+                             f'user_items[{update_idx}].has_reply = :hasReplyVal',
+            ExpressionAttributeValues={
+                ':val': reply,
+                ':hasReplyVal': 1
+            }
+        )
+    except Exception as e:
+        logger.error("Error inserting data: {}".format(str(e)))
+        return {
+            "statusCode": 500,
+            "headers": headers,
+            "body": json.dumps("Error inserting data {}".format(str(e)))
+        }
+
+    return {
+        "statusCode": 200,
+        "headers": headers,
+        "body": json.dumps("Item updated successfully")
+    }

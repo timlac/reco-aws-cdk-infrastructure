@@ -86,9 +86,22 @@ class EmotionCategoriesStack(Stack):
             layers=[layer]
         )
 
+        put_reply = lambda_.Function(
+            self, "PutReplyEmotionCategories",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="emotion_categories.update_user.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": table.table_name
+            },
+            memory_size=512,
+            layers=[layer]
+        )
+
         table.grant_read_write_data(create_user_lambda)
         table.grant_read_data(get_users_lambda)
         table.grant_read_data(get_specific_user_lambda)
+        table.grant_read_write_data(put_reply)
 
         emotion_scales_users = api.root.add_resource("users")
 
@@ -106,3 +119,4 @@ class EmotionCategoriesStack(Stack):
 
         # front-end endpoints
         specific_user.add_method("GET", apigateway.LambdaIntegration(get_specific_user_lambda))
+        specific_user.add_method("PUT", apigateway.LambdaIntegration(put_reply))

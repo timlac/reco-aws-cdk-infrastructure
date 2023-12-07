@@ -16,7 +16,8 @@ def format_item(item):
                 "filename": {"S": item["filename"]},  # "S" for string
                 "video_id": {"S": str(item["video_id"])},
                 "emotion_id": {"S": str(item["emotion_id"])},  # "N" for number
-                "reply": {"S": item["reply"]}
+                "reply": {"S": ""},
+                "has_reply": {"N": "0"}
             }
     }
     return formatted_item
@@ -30,17 +31,17 @@ def handler(event, context):
     logger.info(data)
 
     logger.info("logging data items:")
-    logger.info(data["items"])
+    logger.info(data["user_items"])
 
     # Retrieve the DynamoDB table name from the environment variables
     table_name = os.environ['DYNAMODB_TABLE_NAME']
 
     # Convert the list of items into the DynamoDB L type
-    items_with_attributes = [format_item(item) for item in data["items"]]
+    user_items_with_attributes = [format_item(item) for item in data["user_items"]]
     emotion_alternatives = [{"S": emotion_id} for emotion_id in data["emotion_alternatives"]]
 
     logger.info("post attribute adding")
-    logger.info(items_with_attributes)
+    logger.info(user_items_with_attributes)
 
     current_time = int(time.time())  # Convert to an integer timestamp
     try:
@@ -48,8 +49,8 @@ def handler(event, context):
         response = dynamodb.put_item(
             TableName=table_name,
             Item={
-                "id": {"S": data["alias"]},
-                "items": {"L": items_with_attributes},
+                "id": {"S": data["user_id"]},
+                "user_items": {"L": user_items_with_attributes},
                 "emotion_alternatives": {"L": emotion_alternatives},
                 "valence": {"S": data["valence"]},
                 "createdAt": {"N": str(str(current_time))},
