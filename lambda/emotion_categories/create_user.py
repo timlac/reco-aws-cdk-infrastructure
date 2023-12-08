@@ -2,6 +2,9 @@ import os
 import json
 import boto3
 import time  # Import the time module
+import datetime
+from zoneinfo import ZoneInfo
+
 from aws_lambda_powertools import Logger
 
 # Initialize the AWS SDK clients
@@ -43,7 +46,11 @@ def handler(event, context):
     logger.info("post attribute adding")
     logger.info(user_items_with_attributes)
 
-    current_time = int(time.time())  # Convert to an integer timestamp
+    logger.info("sex")
+    logger.info(data["sex"])
+
+    current_date = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())  # Convert to an integer timestamp
+
     try:
         # Insert data into the DynamoDB table
         response = dynamodb.put_item(
@@ -53,7 +60,9 @@ def handler(event, context):
                 "user_items": {"L": user_items_with_attributes},
                 "emotion_alternatives": {"L": emotion_alternatives},
                 "valence": {"S": data["valence"]},
-                "createdAt": {"N": str(str(current_time))},
+                "created_at": {"S": current_date},
+                "date_of_birth": {"S": data["date_of_birth"]},
+                "sex": {"S": data["sex"]}
                 # Add other attributes here
             },
             ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist
