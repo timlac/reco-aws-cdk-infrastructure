@@ -9,6 +9,18 @@ from serializer import to_serializable
 logger = Logger()
 
 
+def scan_full_table(db_table, limit=None):
+    ret = []
+    resp = db_table.scan()
+    ret += resp['Items']
+
+    while 'LastEvaluatedKey' in resp:
+        resp = db_table.scan(ExclusiveStartKey=resp['LastEvaluatedKey'])
+        ret += resp['Items']
+
+    return ret
+
+
 def handler(event, context):
     # Initialize DynamoDB client
     dynamodb = boto3.resource('dynamodb')
@@ -24,8 +36,8 @@ def handler(event, context):
     try:
         logger.info("scanning table")
         # Scan table to retrieve all users
-        response = table.scan()
-        items = response.get('Items', [])
+        # response = table.scan()
+        items = scan_full_table(table)
         logger.info("retrieved items")
 
         return {

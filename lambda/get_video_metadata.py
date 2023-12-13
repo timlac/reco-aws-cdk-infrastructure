@@ -16,9 +16,12 @@ def handler(event, context):
 
     try:
         # Scan table to retrieve all users
-        response = table.scan(
-            FilterExpression=Attr("sex").eq("m") & Attr("intensity_level").eq(3)
-        )
+        # response = table.scan(
+        #     FilterExpression=Attr("sex").eq("m") & Attr("intensity_level").eq(3)
+        # )
+
+        response = table.scan()
+
         items = response.get('Items', [])
 
         return {

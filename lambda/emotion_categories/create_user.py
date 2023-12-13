@@ -13,14 +13,25 @@ logger = Logger()
 
 
 def format_item(item):
+
+    if "reply" in item:
+        reply = item["reply"]
+    else:
+        reply = ""
+
+    if "has_reply" in item:
+        has_reply = item["has_reply"]
+    else:
+        has_reply = 0
+
     formatted_item = {
         "M":
             {
                 "filename": {"S": item["filename"]},  # "S" for string
                 "video_id": {"S": str(item["video_id"])},
                 "emotion_id": {"S": str(item["emotion_id"])},  # "N" for number
-                "reply": {"S": ""},
-                "has_reply": {"N": "0"}
+                "reply": {"S": str(reply)},
+                "has_reply": {"N": str(has_reply)}
             }
     }
     return formatted_item
@@ -34,17 +45,17 @@ def handler(event, context):
     logger.info(data)
 
     logger.info("logging data items:")
-    logger.info(data["user_items"])
+    logger.info(data["survey_items"])
 
     # Retrieve the DynamoDB table name from the environment variables
     table_name = os.environ['DYNAMODB_TABLE_NAME']
 
     # Convert the list of items into the DynamoDB L type
-    user_items_with_attributes = [format_item(item) for item in data["user_items"]]
+    survey_items_with_attributes = [format_item(item) for item in data["survey_items"]]
     emotion_alternatives = [{"S": emotion_id} for emotion_id in data["emotion_alternatives"]]
 
     logger.info("post attribute adding")
-    logger.info(user_items_with_attributes)
+    logger.info(survey_items_with_attributes)
 
     logger.info("sex")
     logger.info(data["sex"])
@@ -56,12 +67,13 @@ def handler(event, context):
         response = dynamodb.put_item(
             TableName=table_name,
             Item={
-                "id": {"S": data["user_id"]},
-                "user_items": {"L": user_items_with_attributes},
+                "id": {"S": data["survey_id"]},
+                "user_id": {"S": data["user_id"]},
+                "survey_items": {"L": survey_items_with_attributes},
                 "emotion_alternatives": {"L": emotion_alternatives},
                 "valence": {"S": data["valence"]},
                 "created_at": {"S": current_date},
-                "date_of_birth": {"S": data["date_of_birth"]},
+                "date_of_birth": {"S": str(data["date_of_birth"])},
                 "sex": {"S": data["sex"]}
                 # Add other attributes here
             },

@@ -9,6 +9,9 @@ from constructs import Construct
 from aws_cdk.aws_cognito import UserPool
 
 
+# TODO: RENAME EVERYTHING CALLED USERS TO SURVEY
+# TODO: CONSIDER RENAMING PK IN DB ALSO
+
 class EmotionCategoriesStack(Stack):
 
     def __init__(self,
@@ -70,7 +73,7 @@ class EmotionCategoriesStack(Stack):
             environment={
                 "DYNAMODB_TABLE_NAME": table.table_name
             },
-            memory_size=512,
+            memory_size=2048,
             layers=[layer]
         )
 
