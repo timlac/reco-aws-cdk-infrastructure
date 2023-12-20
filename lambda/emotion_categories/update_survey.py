@@ -35,9 +35,9 @@ def item_has_reply(has_reply):
 
 def handler(event, context):
     # User ID (primary key) associated with the items
-    user_id = event['pathParameters']['userId']
+    survey_id = event['pathParameters']['surveyId']
 
-    logger.info(user_id)
+    logger.info(survey_id)
 
     data = json.loads(event["body"])
     filename = data['filename']
@@ -57,7 +57,7 @@ def handler(event, context):
 
     # Step 2: Retrieve existing user's data
     response = table.get_item(
-        Key={'id': user_id}
+        Key={'id': survey_id}
     )
 
     logger.info("response")
@@ -65,7 +65,7 @@ def handler(event, context):
 
     # Check if the user exists (Item is native DynamoDB)
     if 'Item' not in response:
-        return get_response_404('Error: user {user_id} does not exist'.format(user_id=user_id))
+        return get_response_404('Error: survey {user_id} does not exist'.format(user_id=survey_id))
 
     dynamo_item = response['Item']
     update_idx = None
@@ -99,7 +99,7 @@ def handler(event, context):
 
     try:
         table.update_item(
-            Key={'id': user_id},
+            Key={'id': survey_id},
             UpdateExpression=f'SET user_items[{update_idx}].reply = :val, '
                              f'user_items[{update_idx}].has_reply = :hasReplyVal',
             ExpressionAttributeValues={

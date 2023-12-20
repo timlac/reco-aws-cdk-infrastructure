@@ -26,10 +26,12 @@ def handler(event, context):
     table = dynamodb.Table(table_name)
 
     try:
-        response = table.scan(
-            FilterExpression=Attr("id").eq(user_id)
+        response = table.get_item(
+            Key={
+                'id': user_id
+            }
         )
-        items = response.get('Items', [])
+        item = response.get('Item')  # Get the single item
 
         return {
             'statusCode': 200,
@@ -37,7 +39,7 @@ def handler(event, context):
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Credentials': True
             },
-            'body': json.dumps(items, default=to_serializable)
+            'body': json.dumps(item, default=to_serializable)
         }
 
     except Exception as e:

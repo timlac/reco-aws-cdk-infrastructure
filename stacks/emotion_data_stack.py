@@ -9,14 +9,13 @@ from constructs import Construct
 from aws_cdk.aws_cognito import UserPool
 
 
-# TODO: RENAME EVERYTHING CALLED USERS TO SURVEY
-# TODO: CONSIDER RENAMING PK IN DB ALSO
-
-class EmotionCategoriesStack(Stack):
+class EmotionDataStack(Stack):
 
     def __init__(self,
                  scope: Construct,
                  construct_id: str,
+                 table_name: str,
+                 api_name: str,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -37,14 +36,14 @@ class EmotionCategoriesStack(Stack):
                                                            cognito_user_pools=[user_pool])
 
         api = apigateway.RestApi(self,
-                                 "EmotionCategoriesApi",
+                                 api_name,
                                  default_cors_preflight_options=apigateway.CorsOptions(
                                      allow_origins=apigateway.Cors.ALL_ORIGINS,
                                      allow_methods=apigateway.Cors.ALL_METHODS,
                                      allow_headers=["*"]
                                  ))
 
-        table = dynamodb.Table(self, "EmotionCategoriesResponseTable",
+        table = dynamodb.Table(self, table_name,
                                partition_key=dynamodb.Attribute(
                                    name="id",
                                    type=dynamodb.AttributeType.STRING

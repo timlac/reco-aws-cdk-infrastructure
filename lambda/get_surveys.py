@@ -9,6 +9,24 @@ from serializer import to_serializable
 logger = Logger()
 
 
+def set_progress(items):
+    for idx, survey in enumerate(items):
+        count = sum(1 for item in survey["survey_items"] if item["has_reply"] == 1)
+        total = len(survey["survey_items"])
+
+        items[idx]["progress"] = count / total
+    return items
+
+
+def set_accuracy(items):
+    for idx, survey in enumerate(items):
+        count = sum(1 for item in survey["survey_items"] if item["emotion_id"] == item["reply"])
+        total = len(survey["survey_items"])
+
+        items[idx]["accuracy"] = count / total
+    return items
+
+
 def scan_full_table(db_table, limit=None):
     ret = []
     resp = db_table.scan()
