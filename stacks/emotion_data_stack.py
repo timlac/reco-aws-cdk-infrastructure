@@ -55,7 +55,7 @@ class EmotionDataStack(Stack):
         create_survey_lambda = lambda_.Function(
             self, "CreateSurvey",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="emotion_categories.create_survey.handler",
+            handler="create_survey.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
                 "DYNAMODB_TABLE_NAME": table.table_name
@@ -91,7 +91,7 @@ class EmotionDataStack(Stack):
         put_reply = lambda_.Function(
             self, "PutReply",
             runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="emotion_categories.update_survey.handler",
+            handler="update_survey.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
                 "DYNAMODB_TABLE_NAME": table.table_name
@@ -105,7 +105,7 @@ class EmotionDataStack(Stack):
         table.grant_read_data(get_specific_survey_lambda)
         table.grant_read_write_data(put_reply)
 
-        users = api.root.add_resource("users")
+        users = api.root.add_resource("surveys")
 
         # backoffice endpoints
         users.add_method("POST", apigateway.LambdaIntegration(create_survey_lambda),
@@ -117,7 +117,7 @@ class EmotionDataStack(Stack):
                          authorization_type=apigateway.AuthorizationType.COGNITO
                          )
 
-        specific_user = users.add_resource("{userId}")
+        specific_user = users.add_resource("{surveyId}")
 
         # front-end endpoints
         specific_user.add_method("GET", apigateway.LambdaIntegration(get_specific_survey_lambda))

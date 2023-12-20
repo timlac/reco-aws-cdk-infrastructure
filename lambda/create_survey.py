@@ -17,7 +17,7 @@ def format_item(item):
     if "reply" in item:
         reply = item["reply"]
     else:
-        reply = ""
+        reply = {}
 
     if "has_reply" in item:
         has_reply = item["has_reply"]
@@ -30,7 +30,7 @@ def format_item(item):
                 "filename": {"S": item["filename"]},  # "S" for string
                 "video_id": {"S": str(item["video_id"])},
                 "emotion_id": {"S": str(item["emotion_id"])},  # "N" for number
-                "reply": {"S": str(reply)},
+                "reply": {"M": reply},
                 "has_reply": {"N": str(has_reply)}
             }
     }
