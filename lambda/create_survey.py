@@ -4,7 +4,7 @@ import boto3
 import time  # Import the time module
 import datetime
 from zoneinfo import ZoneInfo
-from generate_survey_id import generate
+from generate_survey_id import generate_id
 from serializer import to_serializable
 
 from aws_lambda_powertools import Logger
@@ -66,12 +66,14 @@ def handler(event, context):
     current_date = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())  # Convert to an integer timestamp
 
     try:
-        survey_id = generate()
+        survey_id = generate_id()
+
+        logger.info(f"survey_id: {survey_id}")
 
         # Insert data into the DynamoDB table
         table.put_item(
             Item={
-                "id": {"S": survey_id},
+                "id": survey_id,  # because id is already defined in the db schema we don't need to cast it
                 "user_id": {"S": data["user_id"]},
                 "survey_items": {"L": survey_items_with_attributes},
                 "emotion_alternatives": {"L": emotion_alternatives},
@@ -91,7 +93,7 @@ def handler(event, context):
         )
         item = response.get('Item')  # Get the single item
 
-        logger.info("Data inserted successfully: {}".format(response))
+        # logger.info("Data inserted successfully: {}".format(response))
         return {
             "statusCode": 200,
             "headers": {

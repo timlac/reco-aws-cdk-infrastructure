@@ -2,7 +2,7 @@ import hashlib
 import uuid
 
 
-def generate():
+def generate_id():
     # Generate a random UUID
     unique_uuid = uuid.uuid4()
 
