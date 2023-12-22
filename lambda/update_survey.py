@@ -65,13 +65,13 @@ def handler(event, context):
 
     # Check if the user exists (Item is native DynamoDB)
     if 'Item' not in response:
-        return get_response_404('Error: survey {user_id} does not exist'.format(user_id=survey_id))
+        return get_response_404('Error: survey {survey_id} does not exist'.format(survey_id))
 
     dynamo_item = response['Item']
     update_idx = None
 
     # items the user attribute for filename we seek user replies for
-    for idx, item in enumerate(dynamo_item['user_items']):
+    for idx, item in enumerate(dynamo_item['survey_items']):
 
         logger.info("idx: {}".format(idx))
 
@@ -100,8 +100,8 @@ def handler(event, context):
     try:
         table.update_item(
             Key={'id': survey_id},
-            UpdateExpression=f'SET user_items[{update_idx}].reply = :val, '
-                             f'user_items[{update_idx}].has_reply = :hasReplyVal',
+            UpdateExpression=f'SET survey_items[{update_idx}].reply = :val, '
+                             f'survey_items[{update_idx}].has_reply = :hasReplyVal',
             ExpressionAttributeValues={
                 ':val': reply,
                 ':hasReplyVal': 1

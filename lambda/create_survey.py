@@ -4,11 +4,13 @@ import boto3
 import time  # Import the time module
 import datetime
 from zoneinfo import ZoneInfo
+from generate_survey_id import generate
+from serializer import to_serializable
 
 from aws_lambda_powertools import Logger
 
 # Initialize the AWS SDK clients
-dynamodb = boto3.client('dynamodb')
+dynamodb = boto3.resource('dynamodb')
 logger = Logger()
 
 
@@ -49,6 +51,7 @@ def handler(event, context):
 
     # Retrieve the DynamoDB table name from the environment variables
     table_name = os.environ['DYNAMODB_TABLE_NAME']
+    table = dynamodb.Table(table_name)
 
     # Convert the list of items into the DynamoDB L type
     survey_items_with_attributes = [format_item(item) for item in data["survey_items"]]
@@ -63,11 +66,12 @@ def handler(event, context):
     current_date = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())  # Convert to an integer timestamp
 
     try:
+        survey_id = generate()
+
         # Insert data into the DynamoDB table
-        response = dynamodb.put_item(
-            TableName=table_name,
+        table.put_item(
             Item={
-                "id": {"S": data["survey_id"]},
+                "id": {"S": survey_id},
                 "user_id": {"S": data["user_id"]},
                 "survey_items": {"L": survey_items_with_attributes},
                 "emotion_alternatives": {"L": emotion_alternatives},
@@ -80,6 +84,13 @@ def handler(event, context):
             ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist
         )
 
+        response = table.get_item(
+            Key={
+                'id': survey_id
+            }
+        )
+        item = response.get('Item')  # Get the single item
+
         logger.info("Data inserted successfully: {}".format(response))
         return {
             "statusCode": 200,
@@ -87,7 +98,7 @@ def handler(event, context):
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Credentials": True
             },
-            "body": json.dumps("Data inserted successfully")
+            "body": json.dumps(item, default=to_serializable)
         }
     except Exception as e:
         logger.error("Error inserting data: {}".format(str(e)))

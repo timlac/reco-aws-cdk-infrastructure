@@ -15,11 +15,11 @@ def handler(event, context):
     # Initialize DynamoDB client
     dynamodb = boto3.resource('dynamodb')
 
-    user_id = event['pathParameters']['userId']
+    survey_id = event['pathParameters']['surveyId']
 
     logger.info("event['pathParameters']: ", event['pathParameters'])
 
-    logger.info("user id: ", user_id)
+    logger.info("survey_id id: ", survey_id)
 
     # Retrieve the DynamoDB table name from the environment variables
     table_name = os.environ['DYNAMODB_TABLE_NAME']
@@ -28,7 +28,7 @@ def handler(event, context):
     try:
         response = table.get_item(
             Key={
-                'id': user_id
+                'id': survey_id
             }
         )
         item = response.get('Item')  # Get the single item
