@@ -2,6 +2,7 @@ import boto3
 import json
 import os
 from aws_lambda_powertools import Logger
+from boto3.dynamodb.conditions import Key
 
 
 from serializer import to_serializable
@@ -40,6 +41,8 @@ def scan_full_table(db_table, limit=None):
 
 
 def handler(event, context):
+    survey_type = event['pathParameters']['survey_type']
+
     # Initialize DynamoDB client
     dynamodb = boto3.resource('dynamodb')
 
@@ -47,15 +50,16 @@ def handler(event, context):
     table_name = os.environ['DYNAMODB_TABLE_NAME']
     table = dynamodb.Table(table_name)
 
-    logger.info("table:")
-    logger.info(table_name)
-    logger.info(table)
-
     try:
         logger.info("scanning table")
         # Scan table to retrieve all users
         # response = table.scan()
-        items = scan_full_table(table)
+
+        response = table.query(
+            KeyConditionExpression=Key('survey_type').eq(survey_type)
+        )
+        items = response['Items']
+
         logger.info("retrieved items")
 
         return {

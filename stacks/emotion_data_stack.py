@@ -14,8 +14,6 @@ class EmotionDataStack(Stack):
     def __init__(self,
                  scope: Construct,
                  construct_id: str,
-                 table_name: str,
-                 api_name: str,
                  **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
@@ -36,16 +34,20 @@ class EmotionDataStack(Stack):
                                                            cognito_user_pools=[user_pool])
 
         api = apigateway.RestApi(self,
-                                 api_name,
+                                 "survey_api",
                                  default_cors_preflight_options=apigateway.CorsOptions(
                                      allow_origins=apigateway.Cors.ALL_ORIGINS,
                                      allow_methods=apigateway.Cors.ALL_METHODS,
                                      allow_headers=["*"]
                                  ))
 
-        table = dynamodb.Table(self, table_name,
+        table = dynamodb.Table(self, "survey_table",
                                partition_key=dynamodb.Attribute(
-                                   name="id",
+                                   name="survey_type",
+                                   type=dynamodb.AttributeType.STRING
+                               ),
+                               sort_key=dynamodb.Attribute(
+                                   name="survey_id",
                                    type=dynamodb.AttributeType.STRING
                                ),
                                billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
@@ -105,19 +107,21 @@ class EmotionDataStack(Stack):
         table.grant_read_data(get_specific_survey_lambda)
         table.grant_read_write_data(put_reply)
 
-        users = api.root.add_resource("surveys")
+        response_type = api.root.add_resource("{survey_type}")
+
+        surveys = response_type.add_resource("surveys")
 
         # backoffice endpoints
-        users.add_method("POST", apigateway.LambdaIntegration(create_survey_lambda),
+        surveys.add_method("POST", apigateway.LambdaIntegration(create_survey_lambda),
                          authorizer=authorizer,
                          authorization_type=apigateway.AuthorizationType.COGNITO
                          )
-        users.add_method("GET", apigateway.LambdaIntegration(get_surveys_lambda),
+        surveys.add_method("GET", apigateway.LambdaIntegration(get_surveys_lambda),
                          authorizer=authorizer,
                          authorization_type=apigateway.AuthorizationType.COGNITO
                          )
 
-        specific_user = users.add_resource("{surveyId}")
+        specific_user = surveys.add_resource("{survey_id}")
 
         # front-end endpoints
         specific_user.add_method("GET", apigateway.LambdaIntegration(get_specific_survey_lambda))

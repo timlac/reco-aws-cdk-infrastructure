@@ -6,6 +6,7 @@ import datetime
 from zoneinfo import ZoneInfo
 from generate_survey_id import generate_id
 from serializer import to_serializable
+from survey_types import survey_types
 
 from aws_lambda_powertools import Logger
 
@@ -33,14 +34,14 @@ def format_item(item):
 
 
 def handler(event, context):
+
+    survey_type = event['pathParameters']['survey_type']
+
     # Retrieve data from the event
     data = json.loads(event["body"])
 
     logger.info("logging data:")
     logger.info(data)
-
-    logger.info("logging data items:")
-    logger.info(data["survey_items"])
 
     # Retrieve the DynamoDB table name from the environment variables
     table_name = os.environ['DYNAMODB_TABLE_NAME']
@@ -52,6 +53,9 @@ def handler(event, context):
     current_date = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())  # Convert to an integer timestamp
 
     try:
+        if survey_type not in survey_types:
+            raise Exception("Invalid response type")
+
         survey_id = generate_id()
 
         logger.info(f"survey_id: {survey_id}")
@@ -59,7 +63,8 @@ def handler(event, context):
         # Insert data into the DynamoDB table
         table.put_item(
             Item={
-                "id": survey_id,  # because id is already defined in the db schema we don't need to cast it
+                "survey_type": survey_type,
+                "survey_id": survey_id,
                 "user_id": data["user_id"],
                 "survey_items": survey_items_with_attributes,
                 "emotion_alternatives": data["emotion_alternatives"],
@@ -67,14 +72,14 @@ def handler(event, context):
                 "created_at": current_date,
                 "date_of_birth": str(data["date_of_birth"]),
                 "sex": data["sex"]
-                # Add other attributes here
             },
             ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist
         )
 
         response = table.get_item(
             Key={
-                'id': survey_id
+                "survey_type": survey_type,
+                'survey_id': survey_id
             }
         )
         item = response.get('Item')  # Get the single item

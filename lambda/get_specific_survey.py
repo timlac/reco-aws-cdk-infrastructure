@@ -15,9 +15,8 @@ def handler(event, context):
     # Initialize DynamoDB client
     dynamodb = boto3.resource('dynamodb')
 
-    survey_id = event['pathParameters']['surveyId']
-
-    logger.info("event['pathParameters']: ", event['pathParameters'])
+    survey_id = event['pathParameters']['survey_id']
+    survey_type = event['pathParameters']['survey_type']
 
     logger.info("survey_id id: ", survey_id)
 
@@ -28,7 +27,8 @@ def handler(event, context):
     try:
         response = table.get_item(
             Key={
-                'id': survey_id
+                "response_type": survey_type,
+                'survey_id': survey_id
             }
         )
         item = response.get('Item')  # Get the single item

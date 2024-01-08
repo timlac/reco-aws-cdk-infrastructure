@@ -13,13 +13,7 @@ app = cdk.App()
 
 CognitoStack(app, "CognitoStack")
 
-EmotionDataStack(app, "EmotionCategoriesStack",
-                 "EmotionCategoriesTable",
-                 "EmotionCategoriesApi")
-
-EmotionDataStack(app, "EmotionScalesStack",
-                 "EmotionScalesTable",
-                 "EmotionScalesApi")
+EmotionDataStack(app, "EmotionDataStack")
 
 VideoMetadataStack(app, "VideoMetadataStack")
 
