@@ -26,17 +26,10 @@ def format_item(item):
     else:
         has_reply = 0
 
-    formatted_item = {
-        "M":
-            {
-                "filename": {"S": item["filename"]},  # "S" for string
-                "video_id": {"S": str(item["video_id"])},
-                "emotion_id": {"S": str(item["emotion_id"])},  # "N" for number
-                "reply": {"M": reply},
-                "has_reply": {"N": str(has_reply)}
-            }
-    }
-    return formatted_item
+    item["reply"] = reply
+    item["has_reply"] = has_reply
+
+    return item
 
 
 def handler(event, context):
@@ -55,13 +48,6 @@ def handler(event, context):
 
     # Convert the list of items into the DynamoDB L type
     survey_items_with_attributes = [format_item(item) for item in data["survey_items"]]
-    emotion_alternatives = [{"S": emotion_id} for emotion_id in data["emotion_alternatives"]]
-
-    logger.info("post attribute adding")
-    logger.info(survey_items_with_attributes)
-
-    logger.info("sex")
-    logger.info(data["sex"])
 
     current_date = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())  # Convert to an integer timestamp
 
@@ -74,13 +60,13 @@ def handler(event, context):
         table.put_item(
             Item={
                 "id": survey_id,  # because id is already defined in the db schema we don't need to cast it
-                "user_id": {"S": data["user_id"]},
-                "survey_items": {"L": survey_items_with_attributes},
-                "emotion_alternatives": {"L": emotion_alternatives},
-                "valence": {"S": data["valence"]},
-                "created_at": {"S": current_date},
-                "date_of_birth": {"S": str(data["date_of_birth"])},
-                "sex": {"S": data["sex"]}
+                "user_id": data["user_id"],
+                "survey_items": survey_items_with_attributes,
+                "emotion_alternatives": data["emotion_alternatives"],
+                "valence": data["valence"],
+                "created_at": current_date,
+                "date_of_birth": str(data["date_of_birth"]),
+                "sex": data["sex"]
                 # Add other attributes here
             },
             ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist

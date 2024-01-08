@@ -3,6 +3,7 @@ import json
 import boto3
 import time  # Import the time module
 from aws_lambda_powertools import Logger
+from serializer import to_serializable
 
 # Initialize the AWS SDK clients
 dynamodb = boto3.resource('dynamodb')
@@ -37,31 +38,18 @@ def handler(event, context):
     # User ID (primary key) associated with the items
     survey_id = event['pathParameters']['surveyId']
 
-    logger.info(survey_id)
-
     data = json.loads(event["body"])
     filename = data['filename']
     reply = data['reply']
-
-    logger.info(data)
-
-    logger.info(filename)
-    logger.info(reply)
 
     # Retrieve the DynamoDB table name from the environment variables
     table_name = os.environ['DYNAMODB_TABLE_NAME']
     table = dynamodb.Table(table_name)
 
-    logger.info(table_name)
-    logger.info(table)
-
     # Step 2: Retrieve existing user's data
     response = table.get_item(
         Key={'id': survey_id}
     )
-
-    logger.info("response")
-    logger.info(response)
 
     # Check if the user exists (Item is native DynamoDB)
     if 'Item' not in response:
@@ -73,26 +61,12 @@ def handler(event, context):
     # items the user attribute for filename we seek user replies for
     for idx, item in enumerate(dynamo_item['survey_items']):
 
-        logger.info("idx: {}".format(idx))
-
-        logger.info("item: {}".format(item))
-
-        logger.info("item[filename] {}".format(item["filename"]))
-        logger.info("filename {}".format(filename))
-
         if item['filename'] == filename:
-
-            logger.info("filename match found")
 
             if item_has_reply(item['has_reply']):
                 return get_response_404("Error: Reply already exists on user item.")
-
-            logger.info("setting reply")
-
             item['reply'] = reply
             update_idx = idx
-
-            logger.info("update idx: {}".format(update_idx))
 
     if update_idx is None:
         return get_response_404("Error: Filename {} not found...".format(filename))
@@ -107,6 +81,7 @@ def handler(event, context):
                 ':hasReplyVal': 1
             }
         )
+
     except Exception as e:
         logger.error("Error inserting data: {}".format(str(e)))
         return {
@@ -118,5 +93,5 @@ def handler(event, context):
     return {
         "statusCode": 200,
         "headers": headers,
-        "body": json.dumps("Item updated successfully")
+        "body": json.dumps("Item was successfully updated!")
     }
