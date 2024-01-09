@@ -18,7 +18,13 @@ def handler(event, context):
     survey_id = event['pathParameters']['survey_id']
     survey_type = event['pathParameters']['survey_type']
 
-    logger.info("survey_id id: ", survey_id)
+    logger.info(f'Received event: {event}')
+
+    logger.info("\nsurvey_id: ")
+    logger.info(survey_id)
+
+    logger.info("\nsurvey_type: ")
+    logger.info(survey_type)
 
     # Retrieve the DynamoDB table name from the environment variables
     table_name = os.environ['DYNAMODB_TABLE_NAME']
@@ -27,7 +33,7 @@ def handler(event, context):
     try:
         response = table.get_item(
             Key={
-                "response_type": survey_type,
+                "survey_type": survey_type,
                 'survey_id': survey_id
             }
         )

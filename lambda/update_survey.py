@@ -49,12 +49,15 @@ def handler(event, context):
 
     # Step 2: Retrieve existing user's data
     response = table.get_item(
-        Key={'id': survey_id}
+        Key={
+            'survey_id': survey_id,
+            'survey_type': survey_type
+        }
     )
 
     # Check if the user exists (Item is native DynamoDB)
     if 'Item' not in response:
-        return get_response_404('Error: survey {survey_id} does not exist'.format(survey_id))
+        return get_response_404('Error: survey {} does not exist'.format(survey_id))
 
     dynamo_item = response['Item']
     update_idx = None
