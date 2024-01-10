@@ -15,7 +15,9 @@
     ]
   },
   "context": {
-    "userPoolId": "eu-west-1_Iug3XSwRq",
+    "userPoolId-dev": "eu-west-1_EV723m5Ss",
+    "userPoolId-stage": "eu-west-1_E3LU0ww8O",
+    "userPoolId-prod": "eu-west-1_ZZzQNUT8u",
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,
     "@aws-cdk/core:target-partitions": [

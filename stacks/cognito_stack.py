@@ -7,11 +7,11 @@ from constructs import Construct
 
 
 class CognitoStack(Stack):
-    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+    def __init__(self, scope: Construct, construct_id: str, env: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
         # Create a new Cognito User Pool
-        self.user_pool = cognito.UserPool(self, "BackOfficeUserPool",
+        self.user_pool = cognito.UserPool(self, f"BackOfficeUserPool-{env}",
                                           self_sign_up_enabled=False,  # Users cannot sign themselves up
                                           sign_in_aliases=cognito.SignInAliases(username=True, email=True),
                                           auto_verify=cognito.AutoVerifiedAttrs(email=True),
@@ -22,7 +22,7 @@ class CognitoStack(Stack):
                                           # Additional configurations as necessary
                                           )
 
-        user_pool_client = self.user_pool.add_client("BackOfficeClient",
+        user_pool_client = self.user_pool.add_client(f"BackOfficeClient-{env}",
                                                      generate_secret=False,
                                                      # Creates a client secret for this app client
                                                      auth_flows=cognito.AuthFlow(
@@ -47,7 +47,7 @@ class CognitoStack(Stack):
 
         self.user_pool.add_domain("CognitoDomain",
                                   cognito_domain=cognito.CognitoDomainOptions(
-                                      domain_prefix="reco-backoffice",  # This will be part of your endpoint URL
+                                      domain_prefix=f"reco-backoffice-{env}",  # This will be part of your endpoint URL
                                   )
                                   )
 

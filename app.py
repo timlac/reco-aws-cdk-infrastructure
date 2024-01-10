@@ -9,8 +9,11 @@ from stacks.emotion_data_stack import EmotionDataStack
 
 app = cdk.App()
 
-CognitoStack(app, "CognitoStack")
+env = app.node.try_get_context("env")
+env = env if env else 'dev'
 
-EmotionDataStack(app, "EmotionDataStack")
+CognitoStack(app, f"CognitoStack-{env}", env=env)
+
+EmotionDataStack(app, f"EmotionDataStack-{env}", env=env)
 
 app.synth()

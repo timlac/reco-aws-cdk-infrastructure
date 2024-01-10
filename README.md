@@ -56,3 +56,21 @@ command.
  * `cdk docs`        open CDK documentation
 
 Enjoy!
+
+## Building the stacks
+
+CognitoStack:
+
+```
+cdk deploy CognitoStack-dev --context env=dev
+cdk deploy CognitoStack-stage --context env=stage
+cdk deploy CognitoStack-prod --context env=prod
+```
+
+EmotionDataStack:
+
+```
+cdk deploy EmotionDataStack-dev --context env=dev
+cdk deploy EmotionDataStack-stage --context env=stage
+cdk deploy EmotionDataStack-prod --context env=prod
+```
