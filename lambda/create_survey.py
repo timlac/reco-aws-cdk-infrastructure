@@ -20,7 +20,7 @@ def format_item(item):
     if "reply" in item:
         reply = item["reply"]
     else:
-        reply = {}
+        reply = []
 
     if "has_reply" in item:
         has_reply = item["has_reply"]
@@ -71,7 +71,8 @@ def handler(event, context):
                 "valence": data["valence"],
                 "created_at": current_date,
                 "date_of_birth": str(data["date_of_birth"]),
-                "sex": data["sex"]
+                "sex": data["sex"],
+                "reply_format": data["reply_format"]
             },
             ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist
         )
