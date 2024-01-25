@@ -2,5 +2,6 @@
 
 survey_types = {
     "scales",
-    "categories"
+    "categories",
+    "fmri"
 }

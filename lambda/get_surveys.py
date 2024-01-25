@@ -28,6 +28,14 @@ def set_accuracy(items):
     return items
 
 
+# def set_metadata(items):
+#     metadata = []
+#     for idx, survey in enumerate(items):
+#         for survey_item in survey["survey_items"]:
+#             meta = survey_item["filename"]
+#             metadata.append(meta)
+
+
 def scan_full_table(db_table, limit=None):
     ret = []
     resp = db_table.scan()

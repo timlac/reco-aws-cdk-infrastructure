@@ -43,17 +43,25 @@ class EmotionDataStack(Stack):
                                  )
 
         # DynamoDB
-        table = dynamodb.Table(self, "survey_table",
-                               partition_key=dynamodb.Attribute(
-                                   name="survey_type",
-                                   type=dynamodb.AttributeType.STRING
-                               ),
-                               sort_key=dynamodb.Attribute(
-                                   name="survey_id",
-                                   type=dynamodb.AttributeType.STRING
-                               ),
-                               billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
-                               )
+        survey_table = dynamodb.Table(self, "survey_table",
+                                      partition_key=dynamodb.Attribute(
+                                          name="survey_type",
+                                          type=dynamodb.AttributeType.STRING
+                                      ),
+                                      sort_key=dynamodb.Attribute(
+                                          name="survey_id",
+                                          type=dynamodb.AttributeType.STRING
+                                      ),
+                                      billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+                                      )
+
+        survey_type_table = dynamodb.Table(self, "survey-type-table",
+                                           partition_key=dynamodb.Attribute(
+                                               name="survey_type",
+                                               type=dynamodb.AttributeType.STRING
+                                           ),
+                                           billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+                                           )
 
         # Lambdas
         create_survey_lambda = lambda_.Function(
@@ -62,7 +70,7 @@ class EmotionDataStack(Stack):
             handler="create_survey.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
-                "DYNAMODB_TABLE_NAME": table.table_name
+                "DYNAMODB_TABLE_NAME": survey_table.table_name
             },
             layers=[layer]
         )
@@ -73,7 +81,7 @@ class EmotionDataStack(Stack):
             handler="get_surveys.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
-                "DYNAMODB_TABLE_NAME": table.table_name
+                "DYNAMODB_TABLE_NAME": survey_table.table_name
             },
             memory_size=2048,
             layers=[layer]
@@ -85,7 +93,7 @@ class EmotionDataStack(Stack):
             handler="get_specific_survey.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
-                "DYNAMODB_TABLE_NAME": table.table_name
+                "DYNAMODB_TABLE_NAME": survey_table.table_name
             },
             layers=[layer]
         )
@@ -96,31 +104,56 @@ class EmotionDataStack(Stack):
             handler="update_survey.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
-                "DYNAMODB_TABLE_NAME": table.table_name
+                "DYNAMODB_TABLE_NAME": survey_table.table_name
             },
             memory_size=512,
             layers=[layer]
         )
 
-        table.grant_read_write_data(create_survey_lambda)
-        table.grant_read_data(get_surveys_lambda)
-        table.grant_read_data(get_specific_survey_lambda)
-        table.grant_read_write_data(put_reply)
+        get_survey_type = lambda_.Function(self, "GetSurveyType",
+                                           runtime=lambda_.Runtime.PYTHON_3_10,
+                                           handler="get_survey_type.handler",
+                                           code=lambda_.Code.from_asset("lambda"),
+                                           environment={"DYNAMODB_TABLE_NAME": survey_table.table_name},
+                                           memory_size=512,
+                                           layers=[layer]
+                                           )
+
+        create_survey_type = lambda_.Function(self, "CreateSurveyType",
+                                              runtime=lambda_.Runtime.PYTHON_3_10,
+                                              handler="create_survey_type.handler",
+                                              code=lambda_.Code.from_asset("lambda"),
+                                              environment={"DYNAMODB_TABLE_NAME": survey_table.table_name},
+                                              memory_size=512,
+                                              layers=[layer]
+                                              )
+
+        survey_table.grant_read_write_data(create_survey_lambda)
+        survey_table.grant_read_data(get_surveys_lambda)
+        survey_table.grant_read_data(get_specific_survey_lambda)
+        survey_table.grant_read_write_data(put_reply)
+
+        survey_type_table.grant_read_write_data(get_survey_type)
+        survey_type_table.grant_read_write_data(create_survey_type)
 
         # Api routes
         response_type = api.root.add_resource("{survey_type}")
+
+        response_type.add_method("GET", apigateway.LambdaIntegration(get_survey_type),
+                                 authorizer=authorizer,
+                                 authorization_type=apigateway.AuthorizationType.COGNITO)
 
         surveys = response_type.add_resource("surveys")
 
         # backoffice endpoints
         surveys.add_method("POST", apigateway.LambdaIntegration(create_survey_lambda),
-                         authorizer=authorizer,
-                         authorization_type=apigateway.AuthorizationType.COGNITO
-                         )
+                           authorizer=authorizer,
+                           authorization_type=apigateway.AuthorizationType.COGNITO
+                           )
         surveys.add_method("GET", apigateway.LambdaIntegration(get_surveys_lambda),
-                         authorizer=authorizer,
-                         authorization_type=apigateway.AuthorizationType.COGNITO
-                         )
+                           authorizer=authorizer,
+                           authorization_type=apigateway.AuthorizationType.COGNITO
+                           )
 
         specific_user = surveys.add_resource("{survey_id}")
 
