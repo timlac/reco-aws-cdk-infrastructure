@@ -37,7 +37,7 @@ def item_has_reply(has_reply):
 def handler(event, context):
     # User ID (primary key) associated with the items
     survey_id = event['pathParameters']['survey_id']
-    survey_type = event['pathParameters']['survey_type']
+    survey_name = event['pathParameters']['survey_name']
 
     data = json.loads(event["body"])
     filename = data['filename']
@@ -51,7 +51,7 @@ def handler(event, context):
     response = table.get_item(
         Key={
             'survey_id': survey_id,
-            'survey_type': survey_type
+            'survey_name': survey_name
         }
     )
 
@@ -78,7 +78,7 @@ def handler(event, context):
     try:
         table.update_item(
             Key={
-                'survey_type': survey_type,
+                'survey_name': survey_name,
                 'survey_id': survey_id
             },
             UpdateExpression=f'SET survey_items[{update_idx}].reply = :val, '

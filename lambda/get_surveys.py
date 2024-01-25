@@ -49,7 +49,7 @@ def scan_full_table(db_table, limit=None):
 
 
 def handler(event, context):
-    survey_type = event['pathParameters']['survey_type']
+    survey_name = event['pathParameters']['survey_name']
 
     # Initialize DynamoDB client
     dynamodb = boto3.resource('dynamodb')
@@ -64,7 +64,7 @@ def handler(event, context):
         # response = table.scan()
 
         response = table.query(
-            KeyConditionExpression=Key('survey_type').eq(survey_type)
+            KeyConditionExpression=Key('survey_name').eq(survey_name)
         )
         items = response['Items']
 

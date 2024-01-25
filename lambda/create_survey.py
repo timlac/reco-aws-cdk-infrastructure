@@ -6,7 +6,7 @@ import datetime
 from zoneinfo import ZoneInfo
 from generate_survey_id import generate_id
 from serializer import to_serializable
-from survey_types import survey_types
+from survey_names import survey_names
 
 from aws_lambda_powertools import Logger
 
@@ -35,7 +35,7 @@ def format_item(item):
 
 def handler(event, context):
 
-    survey_type = event['pathParameters']['survey_type']
+    survey_name = event['pathParameters']['survey_name']
 
     # Retrieve data from the event
     data = json.loads(event["body"])
@@ -53,7 +53,7 @@ def handler(event, context):
     current_date = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())  # Convert to an integer timestamp
 
     try:
-        if survey_type not in survey_types:
+        if survey_name not in survey_names:
             raise Exception("Invalid response type")
 
         survey_id = generate_id()
@@ -63,7 +63,7 @@ def handler(event, context):
         # Insert data into the DynamoDB table
         table.put_item(
             Item={
-                "survey_type": survey_type,
+                "survey_name": survey_name,
                 "survey_id": survey_id,
                 "user_id": data["user_id"],
                 "survey_items": survey_items_with_attributes,
@@ -79,7 +79,7 @@ def handler(event, context):
 
         response = table.get_item(
             Key={
-                "survey_type": survey_type,
+                "survey_name": survey_name,
                 'survey_id': survey_id
             }
         )
