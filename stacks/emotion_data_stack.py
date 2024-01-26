@@ -125,14 +125,23 @@ class EmotionDataStack(Stack):
                                           layers=[layer]
                                           )
 
-        get_project = lambda_.Function(self, "GetProject",
-                                       runtime=lambda_.Runtime.PYTHON_3_10,
-                                       handler="projects.get_specific_project.handler",
-                                       code=lambda_.Code.from_asset("lambda"),
-                                       environment={"DYNAMODB_TABLE_NAME": project_table.table_name},
-                                       memory_size=512,
-                                       layers=[layer]
-                                       )
+        get_specific_project = lambda_.Function(self, "GetSpecificProject",
+                                                runtime=lambda_.Runtime.PYTHON_3_10,
+                                                handler="projects.get_specific_project.handler",
+                                                code=lambda_.Code.from_asset("lambda"),
+                                                environment={"DYNAMODB_TABLE_NAME": project_table.table_name},
+                                                memory_size=512,
+                                                layers=[layer]
+                                                )
+
+        get_projects = lambda_.Function(self, "GetProjects",
+                                        runtime=lambda_.Runtime.PYTHON_3_10,
+                                        handler="projects.get_projects.handler",
+                                        code=lambda_.Code.from_asset("lambda"),
+                                        environment={"DYNAMODB_TABLE_NAME": project_table.table_name},
+                                        memory_size=512,
+                                        layers=[layer]
+                                        )
 
         get_s3_folders = lambda_.Function(self, "GetS3Folders",
                                           runtime=lambda_.Runtime.PYTHON_3_10,
@@ -150,19 +159,24 @@ class EmotionDataStack(Stack):
         survey_table.grant_read_data(get_specific_survey_lambda)
         survey_table.grant_read_write_data(put_reply)
 
-        project_table.grant_read_data(get_project)
+        project_table.grant_read_data(get_projects)
+        project_table.grant_read_data(get_specific_project)
         project_table.grant_read_write_data(create_project)
 
+        # Api routes
         projects = api.root.add_resource("projects")
 
         projects.add_method("POST", apigateway.LambdaIntegration(create_project),
                             authorizer=authorizer,
                             authorization_type=apigateway.AuthorizationType.COGNITO)
 
-        # Api routes
+        projects.add_method("GET", apigateway.LambdaIntegration(get_projects),
+                            authorizer=authorizer,
+                            authorization_type=apigateway.AuthorizationType.COGNITO)
+
         project_name = projects.add_resource("{project_name}")
 
-        project_name.add_method("GET", apigateway.LambdaIntegration(get_project),
+        project_name.add_method("GET", apigateway.LambdaIntegration(get_specific_project),
                                 authorizer=authorizer,
                                 authorization_type=apigateway.AuthorizationType.COGNITO)
 
@@ -185,7 +199,7 @@ class EmotionDataStack(Stack):
         specific_user.add_method("PUT", apigateway.LambdaIntegration(put_reply))
 
         # Api Deployment
-        api_deployment = apigateway.Deployment(self, "APIDeployment", api=api)
+        api_deployment = apigateway.Deployment(self, "APIDeployment20211005", api=api)
         api_stage = apigateway.Stage(self, f"{env}", deployment=api_deployment, stage_name=env)
 
         s3_folders = api.root.add_resource("s3_folders")

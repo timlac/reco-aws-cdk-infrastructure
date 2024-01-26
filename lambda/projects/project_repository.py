@@ -29,8 +29,20 @@ class ProjectRepository:
                 "project_name": project_name,
                 "survey_type": survey_type,
                 "s3_data_folder": data.get('s3_data_folder'),
+                "emotions_per_survey": data.get('emotions_per_survey'),
                 "reply_meta": data.get('reply_meta')
             },
             ConditionExpression="attribute_not_exists(project_name)"
         )
         return project_name
+
+    def get_projects(self):
+        response = self.table.scan()
+
+        items = response['Items']
+
+        while 'LastEvaluatedKey' in response:
+            response = self.table.scan(ExclusiveStartKey=response['LastEvaluatedKey'])
+            items.extend(response['Items'])
+
+        return items
