@@ -1,1 +1,2 @@
 aws-lambda-powertools
+git+https://github.com/timlac/nexa-sentimotion-filename-parser.git#egg=nexa_sentimotion_filename_parser
