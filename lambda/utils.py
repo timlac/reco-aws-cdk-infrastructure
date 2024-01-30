@@ -2,6 +2,9 @@ from decimal import Decimal
 import json
 import hashlib
 import uuid
+from pathlib import Path
+
+from nexa_sentimotion_filename_parser.metadata import Metadata
 
 
 def to_serializable(val):
@@ -33,3 +36,30 @@ def generate_id():
     # Get the hexadecimal representation of the hash
     unique_hash = hash_object.hexdigest()
     return unique_hash
+
+
+def get_emotion_id(filename):
+    filename = Path(filename).stem
+    metadata = Metadata(filename)
+
+    return metadata.emotion_1_id
+
+
+def get_metadata(filename):
+    """
+    Return a dictionary containing only the selected attributes from the object.
+
+    Parameters:
+    - obj: The object from which to select attributes.
+    - selected_attributes (list): A list of attribute names that should be included in the returned dictionary.
+
+    Returns:
+    dict: A new dictionary containing only the selected attributes and their corresponding values.
+    """
+    selected_attributes = ["video_id", "emotion_1_id", "intensity_level"]
+
+    filename = Path(filename).stem
+    metadata = Metadata(filename)
+
+    return {attr: getattr(metadata, attr) for attr in selected_attributes if hasattr(metadata, attr)}
+

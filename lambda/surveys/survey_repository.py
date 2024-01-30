@@ -14,17 +14,21 @@ class SurveyRepository:
         self.table = boto3.resource('dynamodb').Table(table_name)
 
     def create_survey(self, project_name, data):
+
         # Validate survey type
         survey_type = data.get("survey_type")
         if survey_type not in survey_types:
-            raise Exception("Invalid response type")
+            raise Exception("Invalid response type: {}".format(survey_type))
 
         survey_id = generate_id()
 
         # Convert the list of items into the DynamoDB L type
         survey_items_with_attributes = [initialize_survey_item(survey_item) for survey_item in data.get("survey_items")]
 
+        print("creating current date")
         current_date = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())
+
+        print("current date: " + current_date)
 
         # Insert data into the DynamoDB table
         self.table.put_item(

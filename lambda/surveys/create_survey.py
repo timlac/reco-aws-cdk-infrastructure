@@ -29,5 +29,5 @@ def handler(event, context):
         return generate_response(200, response_item)
 
     except Exception as e:
-        logger.error("Error inserting data: {}".format(str(e)))
+        logger.error(str(e))
         return generate_response(500, "Error inserting data: {}".format(str(e)))
