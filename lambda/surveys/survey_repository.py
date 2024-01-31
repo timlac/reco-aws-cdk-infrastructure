@@ -18,7 +18,7 @@ class SurveyRepository:
         # Validate survey type
         survey_type = data.get("survey_type")
         if survey_type not in survey_types:
-            raise Exception("Invalid response type: {}".format(survey_type))
+            raise Exception("Invalid survey type: {}".format(survey_type))
 
         survey_id = generate_id()
 
@@ -38,6 +38,7 @@ class SurveyRepository:
                 "survey_id": survey_id,
                 "survey_items": survey_items_with_attributes,
                 "created_at": current_date,
+                "s3_folder": data.get("s3_folder"),
                 "user_id": data.get("user_id"),
                 "emotion_alternatives": data.get("emotion_alternatives"),
                 "valence": data.get("valence"),

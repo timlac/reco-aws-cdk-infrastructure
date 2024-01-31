@@ -6,14 +6,14 @@ from constants import PROJECT_NAME_KEY, TABLE_NAME_KEY, SURVEY_ID_KEY
 
 from surveys.survey_repository import SurveyRepository
 
-from survey_item_handler import get_filename_index
+from surveys.survey_item_handler import get_filename_index
 
 logger = Logger()
 
 
 def handler(event, context):
-    survey_id = event['pathParameters'][PROJECT_NAME_KEY]
-    project_name = event['pathParameters'][SURVEY_ID_KEY]
+    survey_id = event['pathParameters'][SURVEY_ID_KEY]
+    project_name = event['pathParameters'][PROJECT_NAME_KEY]
 
     data = json.loads(event["body"])
     filename = data['filename']
@@ -21,6 +21,8 @@ def handler(event, context):
 
     survey_repo = SurveyRepository(os.environ[TABLE_NAME_KEY])
     survey = survey_repo.get_survey(project_name, survey_id)
+
+    print("survey: ", survey)
 
     if not survey:
         return generate_response(404, 'Error: survey {} does not exist'.format(survey_id))
