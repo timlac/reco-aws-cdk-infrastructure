@@ -1,38 +1,43 @@
-from nexa_sentimotion_filename_parser.metadata import Metadata
-from pathlib import Path
+from utils import get_metadata
 
 
-def add_to_folder_dict(obj, folder_dict):
-    object_key = obj['Key']
-    # Split the key into parts based on '/'
-    parts = object_key.split('/')
-    if len(parts) > 1:
-        folder_name = parts[0] + '/'  # Folder name with trailing '/'
-        object_name = parts[-1]  # Object name
+def add_to_folder_dict(object_key, folder_dict):
+    parts = object_key.split("/")
 
-        # Check if the folder name is already in the dictionary, if not, initialize it
-        if folder_name not in folder_dict:
-            folder_dict[folder_name] = {
-                    'objects': [],
-                    'emotion_ids': set()
-                }
+    source_folder = parts[0]
+    partition_folder = parts[1]
+    object_name = parts[2]
 
-        # Append the object name to the folder's list
-        folder_dict[folder_name]["objects"].append(object_name)
-        folder_dict[folder_name]["emotion_ids"].add(get_emotion_id(object_key))
+    if source_folder not in folder_dict:
+        folder_dict[source_folder] = {}
+
+    if partition_folder not in folder_dict[source_folder]:
+        folder_dict[source_folder][partition_folder] = []
+
+    folder_dict[source_folder][partition_folder].append(object_name)
 
 
-def get_emotion_id(object_key):
-    filename = Path(object_key).stem
-    metadata = Metadata(filename)
-
-    return metadata.emotion_1_id
+def add_metadata(folder_dict):
+    for source_folder in folder_dict.keys():
+        mix = 0
+        emotion_ids = set()
+        for partition_folder, files in folder_dict[source_folder].items():
+            if partition_folder == "experiment":
+                for file_name in files:
+                    meta = get_metadata(file_name)
+                    if meta.get("mix") == 1:
+                        mix = 1
+                    emotion_ids.add(meta.get("emotion_1_id"))
+                    if mix == 1:
+                        emotion_ids.add(meta.get("emotion_2_id"))
+        folder_dict[source_folder]["experiment_metadata"] = {
+            "emotion_ids": list(emotion_ids),
+            "mix": mix
+        }
 
 
 def create_folder_dict(objects):
     folder_dict = {}
-
-    print("creating folder dictionary")
 
     # Separate objects into folders and non-folders
     for obj in objects:
@@ -41,6 +46,6 @@ def create_folder_dict(objects):
         if object_key.endswith('/'):
             continue
         else:
-            add_to_folder_dict(obj, folder_dict)
+            add_to_folder_dict(object_key, folder_dict)
 
     return folder_dict

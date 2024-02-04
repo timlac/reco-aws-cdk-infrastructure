@@ -17,7 +17,7 @@ class ProjectRepository:
         item = response.get("Item")
 
         s3_files_with_meta = {}
-        s3_files = item['s3_objects']
+        s3_files = item.get('s3_experiment_objects') + item.get('s3_intro_objects')
 
         for filename in s3_files:
             meta = get_metadata(filename)
@@ -34,15 +34,21 @@ class ProjectRepository:
         if survey_type not in survey_types:
             raise Exception("Invalid survey type")
 
+
+        print(data.get('emotions_per_survey'))
+        print(data.get('samples_per_survey'))
+
         # Insert data into the DynamoDB table
         self.table.put_item(
             Item={
                 "project_name": project_name,
                 "survey_type": survey_type,
-                "s3_objects": data.get("s3_objects"),
+                "s3_experiment_objects": data.get("s3_experiment_objects"),
+                "s3_intro_objects": data.get("s3_intro_objects"),
                 "s3_folder": data.get('s3_folder'),
-                "emotions_per_survey": int(data.get('emotions_per_survey')),
-                "samples_per_survey": int(data.get('samples_per_survey')),
+                "EmotionSamplingEnabled": data.get('emotion_sampling_enabled'),
+                "emotions_per_survey": int(data.get('emotions_per_survey'), 0),
+                "samples_per_survey": int(data.get('samples_per_survey'), 0),
                 "reply_meta": data.get('reply_meta')
             },
             ConditionExpression="attribute_not_exists(project_name)"

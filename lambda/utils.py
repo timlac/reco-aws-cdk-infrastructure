@@ -56,7 +56,7 @@ def get_metadata(filename):
     Returns:
     dict: A new dictionary containing only the selected attributes and their corresponding values.
     """
-    selected_attributes = ["video_id", "emotion_1_id", "intensity_level"]
+    selected_attributes = ["video_id", "mix", "emotion_1_id", "emotion_2_id", "intensity_level"]
 
     filename = Path(filename).stem
     metadata = Metadata(filename)

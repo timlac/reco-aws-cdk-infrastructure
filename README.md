@@ -69,7 +69,7 @@ cdk deploy CognitoStack-prod --context env=prod
 
 EmotionDataStack:
 
-```
+```§
 cdk deploy EmotionDataStack-dev --context env=dev
 cdk deploy EmotionDataStack-stage --context env=stage
 cdk deploy EmotionDataStack-prod --context env=prod

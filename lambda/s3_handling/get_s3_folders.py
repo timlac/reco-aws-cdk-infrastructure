@@ -1,7 +1,7 @@
 import boto3
 import os
 from utils import generate_response
-from s3_handling.folder_handler import create_folder_dict
+from s3_handling.folder_handler import create_folder_dict, add_metadata
 
 s3 = boto3.client('s3')
 
@@ -37,9 +37,7 @@ def handler(event, context):
         all_objects = list_all_bucket_contents(bucket_name)
 
         folder_dict = create_folder_dict(all_objects)
-
-        for folder_name in folder_dict.keys():
-            folder_dict[folder_name]['emotion_ids'] = list(folder_dict[folder_name]['emotion_ids'])
+        add_metadata(folder_dict)
 
         return generate_response(200, folder_dict)
 
