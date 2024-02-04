@@ -29,27 +29,19 @@ class ProjectRepository:
     def create_project(self, data):
         project_name = data.get('project_name')
 
-        survey_type = data.get('survey_type')
-
-        if survey_type not in survey_types:
-            raise Exception("Invalid survey type")
-
-
-        print(data.get('emotions_per_survey'))
-        print(data.get('samples_per_survey'))
-
         # Insert data into the DynamoDB table
         self.table.put_item(
             Item={
                 "project_name": project_name,
-                "survey_type": survey_type,
+                "survey_type": data.get('survey_type'),
                 "s3_experiment_objects": data.get("s3_experiment_objects"),
                 "s3_intro_objects": data.get("s3_intro_objects"),
                 "s3_folder": data.get('s3_folder'),
-                "EmotionSamplingEnabled": data.get('emotion_sampling_enabled'),
-                "emotions_per_survey": int(data.get('emotions_per_survey'), 0),
-                "samples_per_survey": int(data.get('samples_per_survey'), 0),
-                "reply_meta": data.get('reply_meta')
+                "emotion_sampling_enabled": data.get('emotion_sampling_enabled'),
+                "emotions_per_survey": int(data.get('emotions_per_survey', 0)),
+                "samples_per_survey": int(data.get('samples_per_survey', 0)),
+                "reply_format": data.get('reply_format'),
+                "instructions": data.get('instructions')
             },
             ConditionExpression="attribute_not_exists(project_name)"
         )

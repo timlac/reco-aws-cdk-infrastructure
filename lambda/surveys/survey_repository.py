@@ -15,11 +15,6 @@ class SurveyRepository:
 
     def create_survey(self, project_name, data):
 
-        # Validate survey type
-        survey_type = data.get("survey_type")
-        if survey_type not in survey_types:
-            raise Exception("Invalid survey type: {}".format(survey_type))
-
         survey_id = generate_id()
 
         # Convert the list of items into the DynamoDB L type
@@ -33,10 +28,11 @@ class SurveyRepository:
         # Insert data into the DynamoDB table
         self.table.put_item(
             Item={
-                "survey_type": survey_type,
+                "survey_type": data.get("survey_type"),
                 "project_name": project_name,
                 "survey_id": survey_id,
                 "survey_items": survey_items_with_attributes,
+                "example_items": data.get("example_items"),
                 "created_at": current_date,
                 "s3_folder": data.get("s3_folder"),
                 "user_id": data.get("user_id"),
@@ -44,7 +40,8 @@ class SurveyRepository:
                 "valence": data.get("valence"),
                 "date_of_birth": str(data.get("date_of_birth")),
                 "sex": data.get("sex"),
-                "reply_format": data.get("reply_format")
+                "reply_format": data.get("reply_format"),
+                "instructions": data.get("instructions")
             },
             ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist
         )
