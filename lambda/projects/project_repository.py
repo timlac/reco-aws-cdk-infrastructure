@@ -1,5 +1,4 @@
 import boto3
-from constants import survey_types
 from utils import get_metadata
 
 
@@ -7,8 +6,8 @@ class ProjectRepository:
     def __init__(self, table_name):
         self.table = boto3.resource('dynamodb').Table(table_name)
 
-    def get_project(self, project_name):
-        # Your code to fetch a survey
+
+    def get_project(self, project_name, generate_meta=True):
         response = self.table.get_item(
             Key={
                 'project_name': project_name
@@ -16,13 +15,14 @@ class ProjectRepository:
         )
         item = response.get("Item")
 
-        s3_files_with_meta = {}
-        s3_files = item.get('s3_experiment_objects') + item.get('s3_intro_objects')
+        if generate_meta:
+            s3_files_with_meta = {}
+            s3_files = item.get('s3_experiment_objects') + item.get('s3_intro_objects')
 
-        for filename in s3_files:
-            meta = get_metadata(filename)
-            s3_files_with_meta[filename] = meta
-        item["s3_objects_with_meta"] = s3_files_with_meta
+            for filename in s3_files:
+                meta = get_metadata(filename)
+                s3_files_with_meta[filename] = meta
+            item["s3_objects_with_meta"] = s3_files_with_meta
 
         return response.get('Item')
 
@@ -33,7 +33,6 @@ class ProjectRepository:
         self.table.put_item(
             Item={
                 "project_name": project_name,
-                "survey_type": data.get('survey_type'),
                 "s3_experiment_objects": data.get("s3_experiment_objects"),
                 "s3_intro_objects": data.get("s3_intro_objects"),
                 "s3_folder": data.get('s3_folder'),

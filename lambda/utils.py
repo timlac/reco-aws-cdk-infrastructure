@@ -5,6 +5,8 @@ import uuid
 from pathlib import Path
 
 from nexa_sentimotion_filename_parser.metadata import Metadata
+from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
+
 
 
 def to_serializable(val):
@@ -43,6 +45,15 @@ def get_emotion_id(filename):
     metadata = Metadata(filename)
 
     return metadata.emotion_1_id
+
+
+def get_valence(filename):
+    filename = Path(filename).stem
+    metadata = Metadata(filename)
+    emotion_id = metadata.emotion_1_id
+    emotion = Mapper.get_emotion_from_id(emotion_id)
+
+    return Mapper.get_valence_from_emotion(emotion)
 
 
 def get_metadata(filename):

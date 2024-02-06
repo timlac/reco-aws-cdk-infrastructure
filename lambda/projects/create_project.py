@@ -4,7 +4,7 @@ from aws_lambda_powertools import Logger
 
 
 from utils import generate_response
-from constants import survey_types, PROJECT_NAME_KEY, TABLE_NAME_KEY
+from constants import TABLE_NAME_KEY
 from projects.project_repository import ProjectRepository
 
 

@@ -4,9 +4,9 @@ import datetime
 from zoneinfo import ZoneInfo
 
 from utils import generate_id
-from constants import survey_types
 
 from surveys.survey_item_handler import initialize_survey_item
+from surveys.filename_sampling.sample_filenames import sample_filenames
 
 
 class SurveyRepository:
@@ -28,20 +28,16 @@ class SurveyRepository:
         # Insert data into the DynamoDB table
         self.table.put_item(
             Item={
-                "survey_type": data.get("survey_type"),
                 "project_name": project_name,
                 "survey_id": survey_id,
-                "survey_items": survey_items_with_attributes,
-                "example_items": data.get("example_items"),
                 "created_at": current_date,
-                "s3_folder": data.get("s3_folder"),
+
+                "survey_items": survey_items_with_attributes,
                 "user_id": data.get("user_id"),
                 "emotion_alternatives": data.get("emotion_alternatives"),
                 "valence": data.get("valence"),
                 "date_of_birth": str(data.get("date_of_birth")),
                 "sex": data.get("sex"),
-                "reply_format": data.get("reply_format"),
-                "instructions": data.get("instructions")
             },
             ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist
         )

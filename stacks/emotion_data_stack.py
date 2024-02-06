@@ -76,7 +76,8 @@ class EmotionDataStack(Stack):
             handler="surveys.create_survey.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
-                "DYNAMODB_TABLE_NAME": survey_table.table_name
+                "SURVEY_TABLE_NAME": survey_table.table_name,
+                "PROJECT_TABLE_NAME": project_table.table_name
             },
             layers=[layer]
         )
@@ -99,8 +100,10 @@ class EmotionDataStack(Stack):
             handler="surveys.get_specific_survey.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
-                "DYNAMODB_TABLE_NAME": survey_table.table_name
+                "SURVEY_TABLE_NAME": survey_table.table_name,
+                "PROJECT_TABLE_NAME": project_table.table_name
             },
+            memory_size=2048,
             layers=[layer]
         )
 
@@ -159,6 +162,9 @@ class EmotionDataStack(Stack):
         survey_table.grant_read_data(get_specific_survey_lambda)
         survey_table.grant_read_write_data(put_reply)
 
+        project_table.grant_read_data(get_specific_survey_lambda)
+        project_table.grant_read_data(create_survey_lambda)
+
         project_table.grant_read_data(get_projects)
         project_table.grant_read_data(get_specific_project)
         project_table.grant_read_write_data(create_project)
@@ -199,7 +205,7 @@ class EmotionDataStack(Stack):
         specific_user.add_method("PUT", apigateway.LambdaIntegration(put_reply))
 
         # Api Deployment
-        api_deployment = apigateway.Deployment(self, "APIDeployment20211005", api=api)
+        api_deployment = apigateway.Deployment(self, "APIDeployment20230206", api=api)
         api_stage = apigateway.Stage(self, f"{env}", deployment=api_deployment, stage_name=env)
 
         s3_folders = api.root.add_resource("s3_folders")
