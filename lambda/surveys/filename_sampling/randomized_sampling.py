@@ -21,4 +21,5 @@ def get_randomized_filenames(freq2filename, total_count):
             else:
                 break
 
-    return random.shuffle(ret)
+    random.shuffle(ret)
+    return ret

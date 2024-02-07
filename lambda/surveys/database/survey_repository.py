@@ -1,14 +1,19 @@
 import boto3
 from boto3.dynamodb.conditions import Key
-import datetime
-from zoneinfo import ZoneInfo
 
-from utils import generate_id
 
-from surveys.database.survey_item_handler import initialize_survey_item
+from surveys.database.survey_model import SurveyModel
+from utils import get_metadata
+
+
+def generate_meta_for_survey(survey: SurveyModel):
+    for survey_item in survey.survey_items:
+        metadata = get_metadata(survey_item.filename)
+        survey_item.metadata = metadata
 
 
 class SurveyRepository:
+
     def __init__(self, table_name):
         self.table = boto3.resource('dynamodb').Table(table_name)
 
@@ -21,20 +26,37 @@ class SurveyRepository:
         )
         return survey_model
 
-    def get_survey(self, project_name, survey_id):
+    def get_survey(self, project_name, survey_id, generate_meta=True):
         response = self.table.get_item(
             Key={
                 "project_name": project_name,
                 'survey_id': survey_id
             }
         )
-        return response.get('Item')
+        data = response.get('Item')
+        if data is not None:
+            survey_model = SurveyModel(**data)
+            if generate_meta:
+                generate_meta_for_survey(survey_model)
+            return survey_model.dict()
+        else:
+            return None
 
-    def get_surveys(self, project_name):
+    def get_surveys(self, project_name, generate_meta=True):
         response = self.table.query(
             KeyConditionExpression=Key('project_name').eq(project_name)
         )
-        return response.get('Items', [])
+        data = response.get('Items', [])
+        if data:
+            surveys = []
+            for d in data:
+                survey_model = SurveyModel(**d)
+                if generate_meta:
+                    generate_meta_for_survey(survey_model)
+                surveys.append(survey_model.dict())
+            return surveys
+        else:
+            return data
 
     def update_survey(self, project_name, survey_id,
                       update_idx, reply):

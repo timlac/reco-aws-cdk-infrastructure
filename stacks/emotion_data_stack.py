@@ -79,6 +79,7 @@ class EmotionDataStack(Stack):
                 "SURVEY_TABLE_NAME": survey_table.table_name,
                 "PROJECT_TABLE_NAME": project_table.table_name
             },
+            memory_size=2048,
             layers=[layer]
         )
 

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Any
+from typing import Any, Optional, Dict
 
 import datetime
 from zoneinfo import ZoneInfo
@@ -9,6 +9,7 @@ class SurveyItemModel(BaseModel):
     filename: str
     has_reply: int
     reply: list[Any]
+    metadata: Dict[str, Any] = {}
 
 
 class SurveyModel(BaseModel):
@@ -19,11 +20,11 @@ class SurveyModel(BaseModel):
     # metadata
     created_at: str
     user_id: str
-    valence: str
+    valence: Optional[str] = None
     date_of_birth: str
     sex: str
     # the emotion alternatives included in the survey items
-    emotion_alternatives: list[int]
+    emotion_ids: list[int]
     survey_items: list[SurveyItemModel]
 
     def __init__(self, **data):

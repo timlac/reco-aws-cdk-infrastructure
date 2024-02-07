@@ -5030,7 +5030,7 @@
         "reply_structure": "categories"
     },
     "s3_folder": "single_emotion_large",
-    "emotion_sampling_enabled": true,
+    "balanced_sampling_enabled": true,
     "s3_intro_objects": [],
     "s3_objects_with_meta": {
         "A102_adm_p_2.mp4": {

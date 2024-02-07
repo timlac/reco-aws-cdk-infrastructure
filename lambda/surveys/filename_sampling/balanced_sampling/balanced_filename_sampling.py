@@ -1,10 +1,13 @@
+
 import json
 import math
+from collections import Counter
+
 import random
 from utils import get_emotion_id
 
 
-def prefilter_by_emotion(freq2filename):
+def prefilter_by_emotion(freq2filename, skip):
     """
     Organize filenames by emotion ID for faster access.
 
@@ -16,36 +19,66 @@ def prefilter_by_emotion(freq2filename):
     emotion2filenames = {}
     for freq in frequencies:
         for filename in freq2filename[freq]:
-            emotion_id = int(get_emotion_id(filename))
-
-            emotion2filenames.setdefault(emotion_id, []).append(filename)
+            if filename not in skip:
+                emotion_id = int(get_emotion_id(filename))
+                emotion2filenames.setdefault(emotion_id, []).append(filename)
 
     return emotion2filenames
 
 
-def get_files_with_emotions(emotion2filenames, emotion_ids, samples_per_emotion, break_on):
+def adjust_samples_per_emotion(filenames, total_samples):
+    emotions = [get_emotion_id(filename) for filename in filenames]
+
+    # Get the distribution of emotion IDs
+    emotion_distribution = Counter(emotions)
+
+    # Calculate the total number of samples in the dataset
+    total_count = sum(emotion_distribution.values())
+
+    # Calculate samples per emotion based on its proportion in the dataset
+    samples_per_emotion = {}
+    for emotion_id, count in emotion_distribution.items():
+        proportion = count / total_count
+        samples_per_emotion[emotion_id] = math.floor(total_samples * proportion)
+
+    return samples_per_emotion
+
+
+def get_x_number_of_files_per_emotion(emotion2filenames, samples_per_emotion, break_on):
     """
     Sample filenames with a specific emotion id, prioritizing lower frequencies.
 
     :param emotion2filenames: dict with keys: emotion_id and values: list of filenames sorted by frequency
-    :param emotion_ids: emotion ids to sample from
     :param samples_per_emotion: number of files to generate
     :param break_on: break when we reach this number
     :return: list of filenames
     """
     ret = []
-    for idx, emotion_id in enumerate(emotion_ids):
+    for idx, emotion_id in enumerate(samples_per_emotion.keys()):
         if emotion_id in emotion2filenames:
-            filenames = emotion2filenames[emotion_id][:samples_per_emotion]
+            number_of_samples = samples_per_emotion[emotion_id]
+            filenames = emotion2filenames[emotion_id][:number_of_samples]
             ret.extend(filenames)
 
-            if idx >= break_on:
+            # Adjusted to break_on - 1 since idx starts from 0
+            if idx >= break_on - 1:
                 return ret
 
     return ret
 
 
-def get_filenames_for_emotions(freq2filename, emotion_ids, total_count):
+def filter_filenames(freq2filename, emotion_ids):
+    all_filenames = sum(freq2filename.values(), [])
+
+    filtered_filenames = []
+    for filename in all_filenames:
+        emotion_id = get_emotion_id(filename)
+        if emotion_id in emotion_ids:
+            filtered_filenames.append(filename)
+    return filtered_filenames
+
+
+def balanced_filename_sampling(freq2filename, emotion_ids, total_count):
     """
     This function generates a balanced list of filenames for specified emotion ids
 
@@ -55,53 +88,29 @@ def get_filenames_for_emotions(freq2filename, emotion_ids, total_count):
     :return:
     """
     ret = []
-    emotion2filenames = prefilter_by_emotion(freq2filename)
+
+    filtered_filenames = filter_filenames(freq2filename, emotion_ids)
+    emotion2filenames = prefilter_by_emotion(freq2filename, [])
+
+    samples_per_emotion = adjust_samples_per_emotion(filtered_filenames, total_count)
+
+    sampled_filenames = get_x_number_of_files_per_emotion(emotion2filenames,
+                                                          samples_per_emotion,
+                                                          total_count)
+    ret.extend(sampled_filenames)
 
     random.shuffle(emotion_ids)
-    samples_per_emotion = math.floor(total_count / len(emotion_ids))
-    filenames = get_files_with_emotions(emotion2filenames, emotion_ids, samples_per_emotion, total_count)
-    ret.extend(filenames)
+    samples_per_emotion = {}
+    for emotion_id in emotion_ids:
+        samples_per_emotion[emotion_id] = 1
 
-    remaining_count = total_count - len(filenames)
-    filler_filenames = get_files_with_emotions(emotion2filenames, emotion_ids, 1, remaining_count)
+    remaining_count = total_count - len(sampled_filenames)
+
+    emotion2filenames = prefilter_by_emotion(freq2filename, sampled_filenames)
+    filler_filenames = get_x_number_of_files_per_emotion(emotion2filenames,
+                                                         samples_per_emotion,
+                                                         remaining_count)
     ret.extend(filler_filenames)
 
     random.shuffle(ret)
     return ret
-
-
-
-# path = "../../../../tests/data/project_data.json"
-#
-# with open(path) as json_data:
-#     project_data = json.load(json_data)
-#     json_data.close()
-#
-# from surveys.filename_sampling.frequency_2_filename import generate_frequency_2_filename
-# import math
-# from collections import Counter
-# import time
-# from collections import Counter
-#
-#
-# f2f = generate_frequency_2_filename([], project_data["s3_experiment_objects"])
-# eis = [get_emotion_id(filename) for filename in project_data["s3_experiment_objects"]]
-#
-# eis = list(set(eis))
-#
-# start = time.time()
-# final_filenames = get_filenames_for_emotions(f2f, eis, 110)
-# end = time.time()
-#
-# print("elasped time: ", end - start)
-#
-#
-# final_emotion_ids = [get_emotion_id(filename) for filename in final_filenames]
-#
-# print(final_emotion_ids)
-#
-# counts = Counter(final_emotion_ids)
-#
-# for i in counts.items():
-#     print(i)
-#

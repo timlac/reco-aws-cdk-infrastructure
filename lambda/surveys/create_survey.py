@@ -14,17 +14,12 @@ from utils import generate_response, generate_id
 from constants import PROJECT_NAME_KEY
 
 
-# os.environ['AWS_PROFILE'] = 'rackspaceAcc'
-
-# survey_repo = SurveyRepository("EmotionDataStack-dev-surveytable310F762D-1SADR68QRMPOO")
-# project_repo = ProjectRepository("EmotionDataStack-dev-projecttable27032958-GVCRDU4JG31B")
-
 survey_repo = SurveyRepository(os.environ["SURVEY_TABLE_NAME"])
 project_repo = ProjectRepository(os.environ["PROJECT_TABLE_NAME"])
 
 
 def generate_survey_items(project_name, valence):
-    survey_response_items = survey_repo.get_surveys(project_name)
+    survey_response_items = survey_repo.get_surveys(project_name, generate_meta=False)
     project_response_item = project_repo.get_project(project_name, generate_meta=False)
 
     project_model = ProjectModel(**project_response_item)
@@ -38,13 +33,6 @@ def generate_survey_items(project_name, valence):
         survey_items.append(survey_item_model)
 
     return survey_items, emotion_ids
-
-# generate_survey_items("SingleProj", "pos")
-#
-#
-# # TODO: Need to be able to specify the distribution of emotions....
-#
-# # TODO: Either include parameter whether to create survey items in body, or use some other kind of parameter...
 
 
 def handler(event, context):

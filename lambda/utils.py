@@ -8,7 +8,6 @@ from nexa_sentimotion_filename_parser.metadata import Metadata
 from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
 
 
-
 def to_serializable(val):
     if isinstance(val, Decimal):
         return str(val)
