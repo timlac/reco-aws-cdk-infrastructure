@@ -1,8 +1,8 @@
 import os
 
-from constants import PROJECT_NAME_KEY, SURVEY_ID_KEY, TABLE_NAME_KEY
+from constants import PROJECT_NAME_KEY, SURVEY_ID_KEY
 from utils import generate_response
-from surveys.survey_repository import SurveyRepository
+from surveys.database.survey_repository import SurveyRepository
 from projects.project_repository import ProjectRepository
 
 

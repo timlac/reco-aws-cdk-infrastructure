@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Dict, Any
 
 
-class Project(BaseModel):
+class ProjectModel(BaseModel):
     project_name: str
     s3_experiment_objects: list[str]
     s3_intro_objects: list[str]

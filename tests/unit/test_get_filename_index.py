@@ -2,7 +2,7 @@ import unittest
 import json
 
 # Assuming your function and any dependencies (like survey_item_has_reply) are defined in a file named 'survey_utils.py'
-from surveys.survey_item_handler import get_filename_index, survey_item_has_reply
+from surveys.database.survey_item_handler import get_filename_index
 
 
 class TestGetFilenameIndex(unittest.TestCase):

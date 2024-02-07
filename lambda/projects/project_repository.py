@@ -2,7 +2,7 @@ import boto3
 from utils import get_metadata
 from pydantic import ValidationError
 
-from projects.project_model import Project
+from projects.project_model import ProjectModel
 
 class ProjectRepository:
     def __init__(self, table_name):
@@ -30,7 +30,7 @@ class ProjectRepository:
     def create_project(self, data):
         try:
             # Parse and validate input data using the Project model
-            project = Project(**data)
+            project = ProjectModel(**data)
         except ValidationError as e:
             # Handle validation errors, for example, by logging or raising an error
             print(f"Validation Error: {e}")

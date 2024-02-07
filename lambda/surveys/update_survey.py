@@ -4,9 +4,9 @@ from aws_lambda_powertools import Logger
 from utils import generate_response
 from constants import PROJECT_NAME_KEY, TABLE_NAME_KEY, SURVEY_ID_KEY
 
-from surveys.survey_repository import SurveyRepository
+from surveys.database.survey_repository import SurveyRepository
 
-from surveys.survey_item_handler import get_filename_index
+from surveys.database.survey_item_handler import get_filename_index
 
 logger = Logger()
 

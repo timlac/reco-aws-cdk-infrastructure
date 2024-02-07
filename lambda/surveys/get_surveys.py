@@ -2,7 +2,7 @@ import os
 
 from constants import PROJECT_NAME_KEY, TABLE_NAME_KEY
 from utils import generate_response
-from surveys.survey_repository import SurveyRepository
+from surveys.database.survey_repository import SurveyRepository
 
 
 def scan_full_table(db_table, limit=None):
