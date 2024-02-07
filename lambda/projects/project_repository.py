@@ -1,11 +1,12 @@
 import boto3
 from utils import get_metadata
+from pydantic import ValidationError
 
+from projects.project_model import Project
 
 class ProjectRepository:
     def __init__(self, table_name):
         self.table = boto3.resource('dynamodb').Table(table_name)
-
 
     def get_project(self, project_name, generate_meta=True):
         response = self.table.get_item(
@@ -27,24 +28,21 @@ class ProjectRepository:
         return response.get('Item')
 
     def create_project(self, data):
-        project_name = data.get('project_name')
+        try:
+            # Parse and validate input data using the Project model
+            project = Project(**data)
+        except ValidationError as e:
+            # Handle validation errors, for example, by logging or raising an error
+            print(f"Validation Error: {e}")
+            raise
 
-        # Insert data into the DynamoDB table
+        # Insert validated and parsed data into the DynamoDB table
         self.table.put_item(
-            Item={
-                "project_name": project_name,
-                "s3_experiment_objects": data.get("s3_experiment_objects"),
-                "s3_intro_objects": data.get("s3_intro_objects"),
-                "s3_folder": data.get('s3_folder'),
-                "emotion_sampling_enabled": data.get('emotion_sampling_enabled'),
-                "emotions_per_survey": int(data.get('emotions_per_survey', 0)),
-                "samples_per_survey": int(data.get('samples_per_survey', 0)),
-                "reply_format": data.get('reply_format'),
-                "instructions": data.get('instructions')
-            },
+            Item=project.dict(),  # Convert Pydantic model to dictionary
             ConditionExpression="attribute_not_exists(project_name)"
         )
-        return project_name
+
+        return project.project_name
 
     def get_projects(self):
         response = self.table.scan()

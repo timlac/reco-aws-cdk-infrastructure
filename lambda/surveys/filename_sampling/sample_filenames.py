@@ -1,7 +1,7 @@
 from enum import Enum
 from surveys.filename_sampling.frequency_2_filename import generate_frequency_2_filename
-from surveys.filename_sampling.emotion_id_sampling import get_emotion_ids_subset
-from surveys.filename_sampling.balanced_filename_sampling import get_filenames_for_emotions
+from surveys.filename_sampling.balanced_sampling.emotion_id_sampling import get_emotion_ids_subset
+from surveys.filename_sampling.balanced_sampling.balanced_filename_sampling import get_filenames_for_emotions
 from surveys.filename_sampling.randomized_sampling import get_randomized_filenames
 
 from utils import get_emotion_id, get_valence
@@ -46,7 +46,7 @@ def sample_filenames(surveys, project_meta, valence_parameter):
 
     freq2filename = generate_frequency_2_filename(surveys, filenames)
 
-    if project_meta.emotion_sampling_enabled:
+    if project_meta.balanced_sampling_enabled:
         all_emotion_ids = [get_emotion_id(filename) for filename in filenames]
 
         emotion_ids = list(set(all_emotion_ids))

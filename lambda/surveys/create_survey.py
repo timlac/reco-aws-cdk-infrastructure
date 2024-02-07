@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from aws_lambda_powertools import Logger
 
-os.environ['AWS_PROFILE'] = 'rackspaceAcc'
+# os.environ['AWS_PROFILE'] = 'rackspaceAcc'
 
 
 # Initialize the AWS SDK clients
@@ -20,17 +20,17 @@ dynamodb = boto3.resource('dynamodb')
 logger = Logger()
 
 
-# survey_repo = SurveyRepository(os.environ["SURVEY_TABLE_NAME"])
-# project_repo = ProjectRepository(os.environ["PROJECT_TABLE_NAME"])
+survey_repo = SurveyRepository(os.environ["SURVEY_TABLE_NAME"])
+project_repo = ProjectRepository(os.environ["PROJECT_TABLE_NAME"])
 
-survey_repo = SurveyRepository("EmotionDataStack-dev-surveytable310F762D-1SADR68QRMPOO")
-project_repo = ProjectRepository("EmotionDataStack-dev-projecttable27032958-GVCRDU4JG31B")
+# survey_repo = SurveyRepository("EmotionDataStack-dev-surveytable310F762D-1SADR68QRMPOO")
+# project_repo = ProjectRepository("EmotionDataStack-dev-projecttable27032958-GVCRDU4JG31B")
 
 
 class ProjectMeta(BaseModel):
     s3_experiment_objects: list[str]
     samples_per_survey: int
-    emotion_sampling_enabled: bool
+    balanced_sampling_enabled: bool
     emotions_per_survey: int
 
 
@@ -56,12 +56,12 @@ def generate_survey_items(project_name, valence):
     print(survey_items)
 
 
-generate_survey_items("single_1", "pos")
-
-
-# TODO: Need to be able to specify the distribution of emotions....
-
-# TODO: Either include parameter whether to create survey items in body, or use some other kind of parameter...
+# generate_survey_items("SingleProj", "pos")
+#
+#
+# # TODO: Need to be able to specify the distribution of emotions....
+#
+# # TODO: Either include parameter whether to create survey items in body, or use some other kind of parameter...
 
 
 def handler(event, context):
@@ -69,7 +69,7 @@ def handler(event, context):
     # Retrieve data from the event
     data = json.loads(event["body"])
 
-    valence = data.get("valence", None)
+    # valence = data.get("valence", None)
 
     try:
 
