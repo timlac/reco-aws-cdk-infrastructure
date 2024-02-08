@@ -18,7 +18,10 @@ def prefilter_by_emotion(freq2filename, skip):
 
     emotion2filenames = {}
     for freq in frequencies:
-        for filename in freq2filename[freq]:
+        filenames = freq2filename[freq]
+        random.shuffle(filenames)
+
+        for filename in filenames:
             if filename not in skip:
                 emotion_id = int(get_emotion_id(filename))
                 emotion2filenames.setdefault(emotion_id, []).append(filename)
@@ -90,7 +93,7 @@ def balanced_filename_sampling(freq2filename, emotion_ids, total_count):
     ret = []
 
     filtered_filenames = filter_filenames(freq2filename, emotion_ids)
-    emotion2filenames = prefilter_by_emotion(freq2filename, [])
+    emotion2filenames = prefilter_by_emotion(freq2filename, set())
 
     samples_per_emotion = adjust_samples_per_emotion(filtered_filenames, total_count)
 
@@ -99,6 +102,8 @@ def balanced_filename_sampling(freq2filename, emotion_ids, total_count):
                                                           total_count)
     ret.extend(sampled_filenames)
 
+    # this introduces an element of chance, so the results will not be the same every time this function is run
+    # filenames corresponding to the first emotions in the emotion_ids list will be sampled while the last ones will not
     random.shuffle(emotion_ids)
     samples_per_emotion = {}
     for emotion_id in emotion_ids:
@@ -106,7 +111,7 @@ def balanced_filename_sampling(freq2filename, emotion_ids, total_count):
 
     remaining_count = total_count - len(sampled_filenames)
 
-    emotion2filenames = prefilter_by_emotion(freq2filename, sampled_filenames)
+    emotion2filenames = prefilter_by_emotion(freq2filename, set(sampled_filenames))
     filler_filenames = get_x_number_of_files_per_emotion(emotion2filenames,
                                                          samples_per_emotion,
                                                          remaining_count)

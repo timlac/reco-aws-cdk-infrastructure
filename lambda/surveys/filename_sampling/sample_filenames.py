@@ -12,11 +12,11 @@ def sample_filenames(surveys, project_model, valence_parameter):
 
     freq2filename = generate_frequency_2_filename(surveys, filenames)
 
+    all_emotion_ids = [get_emotion_id(filename) for filename in filenames]
+    emotion_ids = list(set(all_emotion_ids))
 
     if project_model.balanced_sampling_enabled:
         # invoke balanced sampling method
-        all_emotion_ids = [get_emotion_id(filename) for filename in filenames]
-        emotion_ids = list(set(all_emotion_ids))
 
         if len(emotion_ids) > project_model.emotions_per_survey:
             # sample limited number of filenames from all available
@@ -30,6 +30,5 @@ def sample_filenames(surveys, project_model, valence_parameter):
         # invoke randomized sampling method
         filenames = get_randomized_filenames(freq2filename,
                                              project_model.samples_per_survey)
-        emotion_ids = []
 
     return filenames, emotion_ids

@@ -6,8 +6,7 @@ def initialize_survey_item(survey_item):
     return survey_item
 
 
-def survey_item_has_reply(survey_item):
-    has_reply = int(survey_item.get('has_reply'))
+def survey_item_has_reply(has_reply):
     if has_reply == 1:
         return True
     elif has_reply == 0:
@@ -24,8 +23,8 @@ def get_filename_index(survey_items, filename):
     """
     filename_idx = None
     for idx, survey_item in enumerate(survey_items):
-        if survey_item['filename'] == filename:
-            if survey_item_has_reply(survey_item):
+        if survey_item.filename == filename:
+            if survey_item_has_reply(survey_item.has_reply):
                 raise Exception("Error: Reply already exists on user survey_item.")
             filename_idx = idx
 
@@ -41,13 +40,4 @@ def set_progress(survey_items):
         total = len(survey["survey_items"])
 
         survey_items[idx]["progress"] = count / total
-    return survey_items
-
-
-def set_accuracy(survey_items):
-    for idx, survey in enumerate(survey_items):
-        count = sum(1 for item in survey["survey_items"] if item["emotion_id"] == item["reply"])
-        total = len(survey["survey_items"])
-
-        survey_items[idx]["accuracy"] = count / total
     return survey_items
