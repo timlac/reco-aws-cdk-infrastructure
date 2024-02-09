@@ -1,5 +1,3 @@
-from utils import get_valence
-
 
 def get_filename(survey_item, survey_id):
     filename = survey_item.get("filename")
@@ -20,7 +18,7 @@ def invert(filename2freq):
     return ret
 
 
-def generate_frequency_2_filename(surveys, filenames):
+def generate_filename2freq(surveys, filenames):
     filename2freq = {}
     for filename in filenames:
         filename2freq[filename] = 0
@@ -33,8 +31,11 @@ def generate_frequency_2_filename(surveys, filenames):
 
             if filename in filename2freq:
                 filename2freq[filename] += 1
+    return filename2freq
 
+
+def generate_frequency_2_filename(surveys, filenames):
+    filename2freq = generate_filename2freq(surveys, filenames)
     freq2filename = invert(filename2freq)
-
     return freq2filename
 

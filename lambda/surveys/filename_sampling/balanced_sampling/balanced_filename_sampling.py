@@ -17,6 +17,7 @@ def prefilter_by_emotion(freq2filename, skip):
     frequencies = sorted(freq2filename.keys())
 
     emotion2filenames = {}
+    # iterating of over frequencies ensures that the lowest frequencies will be appended first
     for freq in frequencies:
         filenames = freq2filename[freq]
         random.shuffle(filenames)
