@@ -1,9 +1,10 @@
 import os
 
 from constants import PROJECT_NAME_KEY, TABLE_NAME_KEY
+from surveys.database.survey_model import SurveyModel
 from utils import generate_response
 from surveys.database.survey_repository import SurveyRepository
-
+from surveys.database.survey_item_handler import set_progress
 
 def scan_full_table(db_table, limit=None):
     ret = []
@@ -24,7 +25,13 @@ def handler(event, context):
 
     try:
         response_items = survey_repo.get_surveys(project_name)
-        return generate_response(200, response_items)
+
+        # setting the progress variable
+        survey_models = [SurveyModel(**item) for item in response_items]
+        set_progress(survey_models)
+        ret = [survey.dict() for survey in survey_models]
+
+        return generate_response(200, ret)
 
     except Exception as e:
         print(e)

@@ -27,6 +27,9 @@ class SurveyModel(BaseModel):
     emotion_ids: list[int]
     survey_items: list[SurveyItemModel]
 
+    progress: Optional[float] = None
+
+
     def __init__(self, **data):
         if 'created_at' not in data:
             data['created_at'] = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())

@@ -1,11 +1,5 @@
 
 
-def initialize_survey_item(survey_item):
-    survey_item["reply"] = survey_item.get("reply", [])
-    survey_item["has_reply"] = survey_item.get("has_reply", 0)
-    return survey_item
-
-
 def survey_item_has_reply(has_reply):
     if has_reply == 1:
         return True
@@ -34,10 +28,8 @@ def get_filename_index(survey_items, filename):
     return filename_idx
 
 
-def set_progress(survey_items):
-    for idx, survey in enumerate(survey_items):
-        count = sum(1 for item in survey["survey_items"] if item["has_reply"] == 1)
-        total = len(survey["survey_items"])
-
-        survey_items[idx]["progress"] = count / total
-    return survey_items
+def set_progress(surveys):
+    for survey in surveys:
+        count = sum(1 for item in survey.survey_items if item.has_reply == 1)
+        total = len(survey.survey_items)
+        survey.progress = count / total
