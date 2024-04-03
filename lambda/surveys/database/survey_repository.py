@@ -22,7 +22,8 @@ class SurveyRepository:
         # Insert data into the DynamoDB table
         self.table.put_item(
             Item=survey_model.dict(),
-            ConditionExpression="attribute_not_exists(id)",  # Check if 'id' does not already exist
+            ConditionExpression="attribute_not_exists(survey_id)",  # Assert that 'survey_id' does not already exist
+            # TODO: write a test to make sure this works properly
         )
         return survey_model
 

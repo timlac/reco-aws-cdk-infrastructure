@@ -29,7 +29,6 @@ class SurveyModel(BaseModel):
 
     progress: Optional[float] = None
 
-
     def __init__(self, **data):
         if 'created_at' not in data:
             data['created_at'] = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())

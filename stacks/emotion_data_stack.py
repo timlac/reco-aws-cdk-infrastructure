@@ -69,6 +69,40 @@ class EmotionDataStack(Stack):
                                        billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
                                        )
 
+        template_table = dynamodb.Table(self, "template-table",
+                                        partition_key=dynamodb.Attribute(
+                                            name="template_id",
+                                            type=dynamodb.AttributeType.STRING
+                                        ),
+                                        sort_key=dynamodb.Attribute(
+                                            name="template_type",
+                                            type=dynamodb.AttributeType.STRING
+                                        ),
+                                        billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
+                                        )
+
+        create_template_lambda = lambda_.Function(
+            self, "CreatTemplate",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="templates.create_template.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": template_table.table_name
+            },
+            layers=[layer]
+        )
+
+        get_template_lambda = lambda_.Function(
+            self, "GetTemplate",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="templates.get_template.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": template_table.table_name
+            },
+            layers=[layer]
+        )
+
         # Lambdas
         create_survey_lambda = lambda_.Function(
             self, "CreateSurvey",
@@ -169,6 +203,9 @@ class EmotionDataStack(Stack):
         project_table.grant_read_data(get_projects)
         project_table.grant_read_data(get_specific_project)
         project_table.grant_read_write_data(create_project)
+
+        template_table.grant_read_write_data(create_template_lambda)
+        template_table.grant_read_data(get_template_lambda)
 
         # Api routes
         projects = api.root.add_resource("projects")
