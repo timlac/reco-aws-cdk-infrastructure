@@ -28,7 +28,6 @@ class TemplateRepository:
         # Insert data into the DynamoDB table
         self.table.put_item(
             Item=template_model.dict(),
-            ConditionExpression="attribute_not_exists(template_name)"
         )
         return template_model
 
