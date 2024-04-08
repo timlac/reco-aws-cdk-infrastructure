@@ -12,6 +12,7 @@ def prefilter_by_emotion(freq2filename, skip):
     Organize filenames by emotion ID for faster access.
 
     :param freq2filename: dict with keys: frequency and values: list of filenames
+    :param skip: list of filenames to skip
     :return: dict with keys: emotion_id and values: list of filenames sorted by frequency
     """
     frequencies = sorted(freq2filename.keys())

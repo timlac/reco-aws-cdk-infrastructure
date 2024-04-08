@@ -71,37 +71,15 @@ class EmotionDataStack(Stack):
 
         template_table = dynamodb.Table(self, "template-table",
                                         partition_key=dynamodb.Attribute(
-                                            name="template_id",
+                                            name="template_type",
                                             type=dynamodb.AttributeType.STRING
                                         ),
                                         sort_key=dynamodb.Attribute(
-                                            name="template_type",
+                                            name="template_name",
                                             type=dynamodb.AttributeType.STRING
                                         ),
                                         billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
                                         )
-
-        create_template_lambda = lambda_.Function(
-            self, "CreatTemplate",
-            runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="templates.create_template.handler",
-            code=lambda_.Code.from_asset("lambda"),
-            environment={
-                "DYNAMODB_TABLE_NAME": template_table.table_name
-            },
-            layers=[layer]
-        )
-
-        get_template_lambda = lambda_.Function(
-            self, "GetTemplate",
-            runtime=lambda_.Runtime.PYTHON_3_10,
-            handler="templates.get_template.handler",
-            code=lambda_.Code.from_asset("lambda"),
-            environment={
-                "DYNAMODB_TABLE_NAME": template_table.table_name
-            },
-            layers=[layer]
-        )
 
         # Lambdas
         create_survey_lambda = lambda_.Function(
@@ -190,6 +168,39 @@ class EmotionDataStack(Stack):
                                           layers=[layer]
                                           )
 
+        create_template_lambda = lambda_.Function(
+            self, "CreatTemplate",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="templates.create_template.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": template_table.table_name
+            },
+            layers=[layer]
+        )
+
+        get_specific_template_lambda = lambda_.Function(
+            self, "GetTemplate",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="templates.get_template.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": template_table.table_name
+            },
+            layers=[layer]
+        )
+
+        get_templates_lambda = lambda_.Function(
+            self, "GetTemplates",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="templates.get_templates.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": template_table.table_name
+            },
+            layers=[layer]
+        )
+
         s3_bucket.grant_read(get_s3_folders)
 
         survey_table.grant_read_write_data(create_survey_lambda)
@@ -205,9 +216,12 @@ class EmotionDataStack(Stack):
         project_table.grant_read_write_data(create_project)
 
         template_table.grant_read_write_data(create_template_lambda)
-        template_table.grant_read_data(get_template_lambda)
+        template_table.grant_read_data(get_specific_template_lambda)
+        template_table.grant_read_data(get_templates_lambda)
 
         # Api routes
+
+        # project routes
         projects = api.root.add_resource("projects")
 
         projects.add_method("POST", apigateway.LambdaIntegration(create_project),
@@ -226,7 +240,8 @@ class EmotionDataStack(Stack):
 
         surveys = project_name.add_resource("surveys")
 
-        # backoffice endpoints
+        # survey routes
+        # survey backoffice
         surveys.add_method("POST", apigateway.LambdaIntegration(create_survey_lambda),
                            authorizer=authorizer,
                            authorization_type=apigateway.AuthorizationType.COGNITO
@@ -236,14 +251,33 @@ class EmotionDataStack(Stack):
                            authorization_type=apigateway.AuthorizationType.COGNITO
                            )
 
-        specific_user = surveys.add_resource("{survey_id}")
+        specific_survey = surveys.add_resource("{survey_id}")
 
-        # survey front-end endpoints
-        specific_user.add_method("GET", apigateway.LambdaIntegration(get_specific_survey_lambda))
-        specific_user.add_method("PUT", apigateway.LambdaIntegration(put_reply))
+        # survey front-end
+        specific_survey.add_method("GET", apigateway.LambdaIntegration(get_specific_survey_lambda))
+        specific_survey.add_method("PUT", apigateway.LambdaIntegration(put_reply))
+
+        # template routes
+        templates = api.root.add_resource("templates")
+        templates.add_method("POST", apigateway.LambdaIntegration(create_template_lambda),
+                             authorizer=authorizer,
+                             authorization_type=apigateway.AuthorizationType.COGNITO)
+
+        template_type = templates.add_resource("{template_type}")
+        template_name = template_type.add_resource("{template_name}")
+
+        template_type.add_method("GET", apigateway.LambdaIntegration(get_templates_lambda),
+                                 authorizer=authorizer,
+                                 authorization_type=apigateway.AuthorizationType.COGNITO
+                                 )
+
+        template_name.add_method("GET", apigateway.LambdaIntegration(get_specific_template_lambda),
+                                 authorizer=authorizer,
+                                 authorization_type=apigateway.AuthorizationType.COGNITO
+                                 )
 
         # Api Deployment
-        api_deployment = apigateway.Deployment(self, "APIDeployment20230206", api=api)
+        api_deployment = apigateway.Deployment(self, "APIDeployment20240408_1", api=api)
         api_stage = apigateway.Stage(self, f"{env}", deployment=api_deployment, stage_name=env)
 
         s3_folders = api.root.add_resource("s3_folders")
