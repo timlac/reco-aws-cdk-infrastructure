@@ -1,7 +1,6 @@
 import boto3
 from boto3.dynamodb.conditions import Key
 
-
 from surveys.database.survey_model import SurveyModel
 from utils import get_metadata
 
@@ -60,12 +59,13 @@ class SurveyRepository:
             return data
 
     def update_survey(self, project_name, survey_id,
-                      update_idx, reply):
+                      update_idx, reply, time_spent_on_item):
         """
         :param project_name: partition key to locate survey
         :param survey_id: sort key to locate survey
         :param update_idx: the survey_items index to update
         :param reply: reply value, e.g. emotion id or scale values
+        :param time_spent_on_item: time spent on survey item
         :return:
         """
         self.table.update_item(
@@ -74,9 +74,11 @@ class SurveyRepository:
                 'survey_id': survey_id
             },
             UpdateExpression=f'SET survey_items[{update_idx}].reply = :val, '
-                             f'survey_items[{update_idx}].has_reply = :hasReplyVal',
+                             f'survey_items[{update_idx}].has_reply = :hasReplyVal, '
+                             f'survey_items[{update_idx}].time_spent_on_item = :timeSpent',
             ExpressionAttributeValues={
                 ':val': reply,
-                ':hasReplyVal': 1
+                ':hasReplyVal': 1,
+                ':timeSpent': time_spent_on_item
             }
         )

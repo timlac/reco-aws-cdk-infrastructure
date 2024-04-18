@@ -7,6 +7,10 @@ from projects.project_repository import ProjectRepository
 
 
 def handler(event, context):
+    """
+    This function queries both the project database and the survey database
+    and returns both project data and survey data.
+    """
 
     survey_id = event['pathParameters'][SURVEY_ID_KEY]
     project_name = event['pathParameters'][PROJECT_NAME_KEY]

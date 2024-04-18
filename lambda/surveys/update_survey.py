@@ -20,11 +20,14 @@ def handler(event, context):
     data = json.loads(event["body"])
     filename = data.get('filename')
     reply = data.get('reply', [])
+    time_spent_on_item = data.get('time_spent_on_item', 0)
+
+    print("time_spent_on_item", time_spent_on_item)
 
     # Use SurveyItemModel to validate reply
     try:
         # Create a temporary SurveyItemModel instance for validation
-        SurveyItemModel(filename=filename, has_reply=0, reply=reply)
+        SurveyItemModel(filename=filename, has_reply=0, reply=reply, time_spent_on_item=time_spent_on_item)
     except ValidationError as e:
         # ValidationError will be raised if 'reply' is not a list
         return generate_response(400, f"Invalid reply format: {e.json()}")
@@ -42,7 +45,7 @@ def handler(event, context):
         return generate_response(404, str(e))
 
     try:
-        survey_repo.update_survey(project_name, survey_id, filename_idx, reply)
+        survey_repo.update_survey(project_name, survey_id, filename_idx, reply, time_spent_on_item)
 
     except Exception as e:
         logger.error("Error inserting data: {}".format(str(e)))
