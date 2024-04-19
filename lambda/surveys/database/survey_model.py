@@ -10,6 +10,7 @@ class SurveyItemModel(BaseModel):
     has_reply: int
     reply: list[Any]
     time_spent_on_item: Optional[int] = None
+    video_duration: Optional[int] = None
     metadata: Dict[str, Any] = {}
 
 

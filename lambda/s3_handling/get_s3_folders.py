@@ -3,6 +3,7 @@ from utils import generate_response
 from s3_handling.folder_handler import create_folder_dict, add_metadata
 from s3_handling.list_bucket_contents import list_all_bucket_contents
 
+
 def handler(event, context):
     bucket_name = os.environ['S3_BUCKET_NAME']
 

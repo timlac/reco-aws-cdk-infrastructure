@@ -59,13 +59,12 @@ class SurveyRepository:
             return data
 
     def update_survey(self, project_name, survey_id,
-                      update_idx, reply, time_spent_on_item):
+                      update_idx, survey_item_model):
         """
         :param project_name: partition key to locate survey
         :param survey_id: sort key to locate survey
         :param update_idx: the survey_items index to update
-        :param reply: reply value, e.g. emotion id or scale values
-        :param time_spent_on_item: time spent on survey item
+        :param survey_item_model: survey item model
         :return:
         """
         self.table.update_item(
@@ -75,10 +74,12 @@ class SurveyRepository:
             },
             UpdateExpression=f'SET survey_items[{update_idx}].reply = :val, '
                              f'survey_items[{update_idx}].has_reply = :hasReplyVal, '
-                             f'survey_items[{update_idx}].time_spent_on_item = :timeSpent',
+                             f'survey_items[{update_idx}].time_spent_on_item = :timeSpent, '
+                             f'survey_items[{update_idx}].video_duration = :videoDuration',
             ExpressionAttributeValues={
-                ':val': reply,
+                ':val': survey_item_model.reply,
                 ':hasReplyVal': 1,
-                ':timeSpent': time_spent_on_item
+                ':timeSpent': survey_item_model.time_spent_on_item,
+                ':videoDuration': survey_item_model.video_duration
             }
         )
