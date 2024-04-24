@@ -1,0 +1,699 @@
+[
+    {
+        "project_name": "expire_test",
+        "survey_id": "b66ad5e7e27d31c415af0b1bd9cfa2d0dac659af0d9ef306f9d80ab0e1df2139",
+        "created_at": "2024-04-10T11:14:40.635Z",
+        "user_id": "default",
+        "valence": null,
+        "date_of_birth": "1999-04-24",
+        "sex": "male",
+        "emotion_ids": [
+            38,
+            18,
+            14,
+            19,
+            39,
+            0,
+            21,
+            3,
+            29,
+            6,
+            41,
+            1,
+            27,
+            33,
+            40,
+            25,
+            36,
+            31,
+            13,
+            9,
+            24,
+            26
+        ],
+        "survey_items": [
+            {
+                "filename": "A102_bor_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 26,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A55_gui_v_2_ver1.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A55",
+                    "mix": 0,
+                    "emotion_1_id": 40,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_sex_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 24,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A323_awe_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A323",
+                    "mix": 0,
+                    "emotion_1_id": 18,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_conf_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 1,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A200_int_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A200",
+                    "mix": 0,
+                    "emotion_1_id": 29,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A407_ins_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A407",
+                    "mix": 0,
+                    "emotion_1_id": 19,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_emb_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 39,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A200_amu_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A200",
+                    "mix": 0,
+                    "emotion_1_id": 13,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_pea_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 25,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A227_hop_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A227",
+                    "mix": 0,
+                    "emotion_1_id": 21,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A227_gui_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A227",
+                    "mix": 0,
+                    "emotion_1_id": 40,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_pos_sur_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 9,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A205_hap_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A205",
+                    "mix": 0,
+                    "emotion_1_id": 33,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_sad_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 6,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_conf_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 1,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A200_sar_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A200",
+                    "mix": 0,
+                    "emotion_1_id": 31,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A227_pri_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A227",
+                    "mix": 0,
+                    "emotion_1_id": 41,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A200_pos_sur_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A200",
+                    "mix": 0,
+                    "emotion_1_id": 9,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_amu_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 13,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A220_pri_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A220",
+                    "mix": 0,
+                    "emotion_1_id": 41,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_sar_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 31,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_bor_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 26,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_sad_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 6,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A220_ins_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A220",
+                    "mix": 0,
+                    "emotion_1_id": 19,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A207_pea_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A207",
+                    "mix": 0,
+                    "emotion_1_id": 25,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_exc_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 36,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A207_dou_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A207",
+                    "mix": 0,
+                    "emotion_1_id": 3,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A221_awe_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A221",
+                    "mix": 0,
+                    "emotion_1_id": 18,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_conc_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 27,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A207_dou_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A207",
+                    "mix": 0,
+                    "emotion_1_id": 3,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A205_hap_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A205",
+                    "mix": 0,
+                    "emotion_1_id": 33,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A227_reg_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A227",
+                    "mix": 0,
+                    "emotion_1_id": 0,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_rel_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 38,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_exc_p_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 36,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A205_rej_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A205",
+                    "mix": 0,
+                    "emotion_1_id": 14,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_sex_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 24,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A102_emb_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 39,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_conc_v_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 27,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A205_rej_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A205",
+                    "mix": 0,
+                    "emotion_1_id": 14,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A220_hop_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A220",
+                    "mix": 0,
+                    "emotion_1_id": 21,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A334_reg_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A334",
+                    "mix": 0,
+                    "emotion_1_id": 0,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            },
+            {
+                "filename": "A200_int_v_3.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A200",
+                    "mix": 0,
+                    "emotion_1_id": 29,
+                    "emotion_2_id": 100,
+                    "intensity_level": 3
+                }
+            },
+            {
+                "filename": "A102_rel_p_2.mp4",
+                "has_reply": 0,
+                "reply": [],
+                "time_spent_on_item": null,
+                "video_duration": null,
+                "last_modified": null,
+                "metadata": {
+                    "video_id": "A102",
+                    "mix": 0,
+                    "emotion_1_id": 38,
+                    "emotion_2_id": 100,
+                    "intensity_level": 2
+                }
+            }
+        ],
+        "progress": 0,
+        "last_modified": null
+    }
+]

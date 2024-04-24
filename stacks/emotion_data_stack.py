@@ -128,7 +128,7 @@ class EmotionDataStack(Stack):
             environment={
                 "DYNAMODB_TABLE_NAME": survey_table.table_name
             },
-            memory_size=512,
+            memory_size=1024,
             layers=[layer]
         )
 

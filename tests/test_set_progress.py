@@ -11,7 +11,7 @@ def set_progress(surveys):
         survey.progress = count / total
 
 
-path = "data/surveys.json"
+path = "data/big_project/surveys.json"
 with open(path) as json_data:
     data = json.load(json_data)
 

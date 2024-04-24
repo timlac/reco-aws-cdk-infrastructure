@@ -3,9 +3,34 @@ import json
 import hashlib
 import uuid
 from pathlib import Path
+import datetime
+from zoneinfo import ZoneInfo
+from dateutil import parser
+from datetime import datetime, timedelta, timezone
+import dateutil
 
 from nexa_sentimotion_filename_parser.metadata import Metadata
 from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
+
+from surveys.database.survey_model import SurveyModel
+
+
+def within_time_delta(survey: SurveyModel, days_threshold):
+    if survey.last_modified:
+        start_date = parser.isoparse(survey.last_modified)
+    else:
+        start_date = parser.isoparse(survey.created_at)
+
+    current_date = datetime.now(ZoneInfo("Europe/Berlin"))
+
+    # Calculating the difference
+    difference = abs(current_date - start_date)  # Use abs to ensure the difference is non-negative
+
+    # Checking if the difference is more or less than 7 days
+    if difference <= timedelta(days=days_threshold):
+        return True
+    else:
+        return False
 
 
 def to_serializable(val):

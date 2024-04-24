@@ -11,11 +11,11 @@ from utils import get_emotion_id
 class TestPrefilterByEmotion(unittest.TestCase):
 
     def setUp(self):
-        project_data_path = "../data/project_data.json"
+        project_data_path = "../data/big_project/project.json"
         with open(project_data_path) as json_data:
             project_data = json.load(json_data)
 
-        surveys_path = "../data/surveys.json"
+        surveys_path = "../data/big_project/surveys.json"
         with open(surveys_path) as json_data:
             survey_data = json.load(json_data)
 

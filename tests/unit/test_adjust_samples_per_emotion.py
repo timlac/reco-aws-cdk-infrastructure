@@ -12,7 +12,7 @@ class TestAdjustSamplesPerEmotion(unittest.TestCase):
 
     def setUp(self):
         # Setup mock survey items
-        path = "../data/project_data.json"
+        path = "../data/big_project/project.json"
         with open(path) as json_data:
             project_data = json.load(json_data)
             self.filenames = project_data["s3_experiment_objects"]

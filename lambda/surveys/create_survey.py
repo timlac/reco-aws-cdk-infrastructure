@@ -19,12 +19,13 @@ project_repo = ProjectRepository(os.environ["PROJECT_TABLE_NAME"])
 
 
 def generate_survey_items(project_name, valence):
-    survey_response_items = survey_repo.get_surveys(project_name, generate_meta=False)
-    project_response_item = project_repo.get_project(project_name, generate_meta=False)
+    surveys_data = survey_repo.get_surveys(project_name, generate_meta=False)
+    project = project_repo.get_project(project_name, generate_meta=False)
 
-    project_model = ProjectModel(**project_response_item)
+    project_model = ProjectModel(**project)
+    surveys = [SurveyModel(**data) for data in surveys_data]
 
-    filenames, emotion_ids = sample_filenames(survey_response_items,
+    filenames, emotion_ids = sample_filenames(surveys,
                                               project_model,
                                               valence)
     survey_items = []

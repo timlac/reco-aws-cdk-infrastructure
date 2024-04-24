@@ -1,0 +1,153 @@
+{
+    "samples_per_survey": "10",
+    "instructions": {
+        "created_at": "2024-04-09T11:25:29.533037+02:00",
+        "template_name": "emotion_categories",
+        "template_type": "instruction",
+        "updated_at": null,
+        "template_json": {
+            "instructions_2": [
+                {
+                    "type": "text",
+                    "content": "Efter varje inspelning måste du välja ett (men inte fler) känslo-ord för\n                        att gå vidare. Det bästa sättet att göra det är att ge ditt spontana svar utan att fundera för mycket.\n                        Notera att personerna talar ett låtsasspråk, så du behöver inte försöka förstå vad de säger.\n                        Fokusera istället på vad de uttrycker med ansikte, röst och kroppsrörelser.\n                        Du kan spela upp samma video så många gånger som du vill och när du har valt den känsla som\n                        du tror visas av skådespelaren så trycker du på skicka för att komma till nästa video!"
+                },
+                {
+                    "type": "text",
+                    "content": "Testet är uppbyggt enligt följande: Först kommer 3 exempel, efter varje videoklipp ska du välja\n                        en känsla, och efter du har sett exempelfilmerna kommer det riktiga testet att börja."
+                }
+            ],
+            "instructions_1": [
+                {
+                    "type": "text",
+                    "content": "Detta test har för avsikt att mäta din förmåga att känna igen känslouttryck i människors\n                        ansikten och röster. Din uppgift är att titta / lyssna på en serie med korta audio-video inspelningar av personer\n                        som uttrycker ett urval av olika känslor."
+                },
+                {
+                    "type": "text",
+                    "content": "Efter varje uppspelning av dessa inspelningar du tittat på,\n                        ombeds du att välja namnet på den känsla som personen uttrycker.\n                        I just detta experiment kommer du att få välja mellan dessa känslor.\n\n                        Känslorna presenteras som knappar där man kan välja svar genom att klicka.\n                        Om man håller muspekaren över knappen så visas en kort beskrivning av känslan, se exempel:"
+                }
+            ],
+            "example_round_instructions_1": [
+                {
+                    "type": "text",
+                    "content": "Välj den känsla du ser i videon nedan. Du kommer att få skicka in svar på tre videor\n                    i syfte att öva på hur det går till. När du svarat på tre video kommer du att kunna gå vidare till det verkliga experimentet.\n                    Tänk på att:"
+                },
+                {
+                    "type": "list",
+                    "content": [
+                        "Genom att hålla musen över ett svarsalternativ så får du en beskrivning av känslan.",
+                        "Du kan inte skicka svaret förrän du spelat hela videon från början till slut.",
+                        "Du kan inte skicka svaret förrän du valt svarsalternativ."
+                    ]
+                }
+            ]
+        }
+    },
+    "emotions_per_survey": "5",
+    "project_name": "single_emotion_limited_4",
+    "s3_experiment_objects": [
+        "A102_amu_v_3.mp4",
+        "A102_ang_p_3.mp4",
+        "A102_ang_v_2.mp4",
+        "A102_anx_p_2.mp4",
+        "A102_anx_p_3.mp4",
+        "A102_bor_p_2.mp4",
+        "A102_bor_p_3.mp4",
+        "A102_conc_p_3.mp4",
+        "A102_conc_v_2.mp4",
+        "A102_conf_p_3.mp4",
+        "A102_conf_v_2.mp4",
+        "A102_det_v_3.mp4",
+        "A102_disa_v_2.mp4",
+        "A102_disa_v_3.mp4",
+        "A102_disg_p_3.mp4",
+        "A102_disg_v_3.mp4",
+        "A102_dist_p_3.mp4",
+        "A102_emb_p_2.mp4",
+        "A102_emb_v_3.mp4",
+        "A102_env_p_3.mp4",
+        "A102_exc_p_3.mp4",
+        "A102_exc_v_3.mp4",
+        "A102_fea_p_2.mp4",
+        "A102_fea_p_3.mp4",
+        "A102_gra_p_3.mp4",
+        "A102_gra_v_3.mp4",
+        "A102_mov_v_3.mp4",
+        "A102_neg_sur_p_2.mp4",
+        "A102_neg_sur_p_3.mp4",
+        "A102_neu_sit1_v.mp4",
+        "A102_neu_sit2_v.mp4",
+        "A102_nos_p_2.mp4",
+        "A102_nos_p_3.mp4",
+        "A102_pea_p_2.mp4",
+        "A102_ple_p_2.mp4",
+        "A102_ple_v_2.mp4",
+        "A102_pos_sur_p_3.mp4",
+        "A102_rel_p_2.mp4",
+        "A102_rel_p_3.mp4",
+        "A102_sad_p_2.mp4",
+        "A102_sad_p_3.mp4",
+        "A102_sar_p_2.mp4",
+        "A102_sat_p_3.mp4",
+        "A102_scha_p_3.mp4",
+        "A102_scha_v_2.mp4",
+        "A102_sex_p_2.mp4",
+        "A102_sex_p_3.mp4",
+        "A102_ten_v_3.mp4",
+        "A102_tri_p_2.mp4",
+        "A102_tri_p_3.mp4",
+        "A200_amu_v_2.mp4",
+        "A200_det_p_3.mp4",
+        "A200_dist_p_2.mp4",
+        "A200_int_v_2.mp4",
+        "A200_int_v_3.mp4",
+        "A200_pos_sur_p_3.mp4",
+        "A200_sar_p_2.mp4",
+        "A205_cont_p_2.mp4",
+        "A205_cont_p_3.mp4",
+        "A205_hap_p_3.mp4",
+        "A205_hap_v_3.mp4",
+        "A205_mov_p_3.mp4",
+        "A205_rej_v_2.mp4",
+        "A205_rej_v_3.mp4",
+        "A205_sat_v_3.mp4",
+        "A205_ten_p_3.mp4",
+        "A207_dou_v_2.mp4",
+        "A207_dou_v_3.mp4",
+        "A207_pea_v_2.mp4",
+        "A220_adm_v_3.mp4",
+        "A220_hop_p_2.mp4",
+        "A220_ins_v_2.mp4",
+        "A220_pri_p_3.mp4",
+        "A221_awe_p_2.mp4",
+        "A221_sha_p_2.mp4",
+        "A221_sha_v_2.mp4",
+        "A227_adm_p_3.mp4",
+        "A227_gui_v_3.mp4",
+        "A227_hop_p_3.mp4",
+        "A227_pri_p_2.mp4",
+        "A227_reg_v_3.mp4",
+        "A303_env_p_3.mp4",
+        "A323_awe_v_2.mp4",
+        "A327_ele_p_3.mp4",
+        "A334_reg_p_2.mp4",
+        "A407_ins_p_2.mp4",
+        "A424_ele_v_3.mp4",
+        "A55_gui_v_2_ver1.mp4"
+    ],
+    "reply_format": {
+        "created_at": "2024-04-08T11:24:50.182088+02:00",
+        "template_name": "emotion_categories",
+        "template_type": "reply_format",
+        "updated_at": null,
+        "template_json": {
+            "reply_structure": "categories"
+        }
+    },
+    "balanced_sampling_enabled": true,
+    "s3_folder": "single_emotion_pilot",
+    "s3_intro_objects": [
+        "A67_pea_v_3.mp4",
+        "A72_det_p_3.mp4",
+        "A91_ang_p_3.mp4"
+    ]
+}

@@ -8,10 +8,22 @@ from utils import get_emotion_id
 
 
 def sample_filenames(surveys, project_model, valence_parameter):
+    """
+    :param surveys: list with all surveys
+    :param project_model: project model with metadata, such as all existing filenames to sample from
+    :param valence_parameter: if None use all filenames, if pos or neg use only subset of filenames
+    """
+
+    # get all available filenames
     filenames = filter_on_valence(project_model.s3_experiment_objects, valence_parameter)
 
-    freq2filename = generate_frequency_2_filename(surveys, filenames)
+    # TODO: introduce a positive parameter in survey called active, or a negative parameter called archived
+    # TODO: use this parameter to exclude inactive/archived surveys from this step
 
+    # generate frequency 2 filename, a dict that describes how often filenames occur in existing surveys.
+    freq2filename = generate_frequency_2_filename(surveys, filenames, project_model.days_to_deactivation)
+
+    # get all emotion ids in filenames as list
     all_emotion_ids = [get_emotion_id(filename) for filename in filenames]
     emotion_ids = list(set(all_emotion_ids))
 

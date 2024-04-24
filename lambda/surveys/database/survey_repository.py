@@ -1,6 +1,7 @@
 import boto3
 from boto3.dynamodb.conditions import Key
-
+import datetime
+from zoneinfo import ZoneInfo
 from surveys.database.survey_model import SurveyModel
 from utils import get_metadata
 
@@ -67,6 +68,7 @@ class SurveyRepository:
         :param survey_item_model: survey item model
         :return:
         """
+        current_time = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())
         self.table.update_item(
             Key={
                 'project_name': project_name,
@@ -75,11 +77,15 @@ class SurveyRepository:
             UpdateExpression=f'SET survey_items[{update_idx}].reply = :val, '
                              f'survey_items[{update_idx}].has_reply = :hasReplyVal, '
                              f'survey_items[{update_idx}].time_spent_on_item = :timeSpent, '
-                             f'survey_items[{update_idx}].video_duration = :videoDuration',
+                             f'survey_items[{update_idx}].video_duration = :videoDuration, '
+                             f'survey_items[{update_idx}].last_modified = :itemLastModified, '
+                             f'last_modified = :surveyLastModified',
             ExpressionAttributeValues={
                 ':val': survey_item_model.reply,
                 ':hasReplyVal': 1,
                 ':timeSpent': survey_item_model.time_spent_on_item,
-                ':videoDuration': survey_item_model.video_duration
+                ':videoDuration': survey_item_model.video_duration,
+                ':itemLastModified': current_time,
+                ':surveyLastModified': current_time
             }
         )

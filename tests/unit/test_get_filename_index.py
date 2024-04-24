@@ -1,22 +1,26 @@
 import unittest
 import json
 
-# Assuming your function and any dependencies (like survey_item_has_reply) are defined in a file named 'survey_utils.py'
 from surveys.database.survey_item_handler import get_filename_index
+from surveys.database.survey_model import SurveyItemModel
 
 
 class TestGetFilenameIndex(unittest.TestCase):
 
     def setUp(self):
         # Setup mock survey items
-        path = "../data/survey_items.json"
+        path = "../data/big_project/surveys.json"
         with open(path) as json_data:
-            self.survey_items = json.load(json_data)
+            surveys = json.load(json_data)
+            survey = surveys[0]
+            self.survey_items = []
+            for survey_item in survey.get("survey_items"):
+                self.survey_items.append(SurveyItemModel(**survey_item))
 
     def test_get_filename_index_success(self):
         # Test finding an index successfully
-        filename = 'A221_hap_p_3.mp4'
-        expected_index = 343
+        filename = 'A102_gra_v_2.mp4'
+        expected_index = 2
         result = get_filename_index(self.survey_items, filename)
         self.assertEqual(result, expected_index)
 
@@ -29,7 +33,7 @@ class TestGetFilenameIndex(unittest.TestCase):
 
     def test_filename_with_reply(self):
         # Test the exception when the survey item already has a reply
-        filename = 'A75_anx_p_2.mp4'
+        filename = 'A102_reg_v_3.mp4'
         with self.assertRaises(Exception) as context:
             get_filename_index(self.survey_items, filename)
         self.assertTrue('Reply already exists on user survey_item.' in str(context.exception))

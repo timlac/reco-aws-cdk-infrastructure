@@ -11,6 +11,7 @@ def get_randomized_filenames(freq2filename, total_count):
     """
     ret = []
     frequencies = sorted(freq2filename.keys())
+
     for freq in frequencies:
         filenames = freq2filename[freq]
         random.shuffle(filenames)

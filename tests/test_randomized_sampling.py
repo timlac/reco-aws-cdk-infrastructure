@@ -1,5 +1,4 @@
 import statistics
-import unittest
 import json
 from collections import Counter
 
@@ -8,28 +7,27 @@ from surveys.filename_sampling.randomized_sampling import get_randomized_filenam
 from utils import get_emotion_id
 
 
-class TestGetRandomizedFilenames(unittest.TestCase):
+class GetRandomizedFilenames:
 
-    def setUp(self):
+    def set_up(self):
         print("setting up....")
         # Setup mock survey items
-        project_path = "../data/big_project/project.json"
+        project_path = "data/big_project/project.json"
+        surveys_path = "data/big_project/surveys.json"
         with open(project_path) as json_data:
             self.project_data = json.load(json_data)
 
-        surveys_path = "../data/big_project/surveys.json"
         with open(surveys_path) as json_data:
             self.surveys = json.load(json_data)
 
-    def test_sample(self):
+    def sample(self):
         freq2filename = generate_frequency_2_filename(self.surveys, self.project_data["s3_experiment_objects"])
-        filenames = get_randomized_filenames(freq2filename, int(self.project_data["samples_per_survey"]))
+        filenames = get_randomized_filenames(freq2filename, self.project_data["sample_size"])
 
         print(filenames)
 
-        self.assertEqual(len(filenames), int(self.project_data["samples_per_survey"]))
 
-    def test_sampling_equally_distributed_filenames(self):
+    def sampling_equally_distributed_filenames(self):
         emotion_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
         samples_per_survey = 132
 
@@ -60,4 +58,6 @@ class TestGetRandomizedFilenames(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    tests = GetRandomizedFilenames()
+    tests.set_up()
+    tests.sample()

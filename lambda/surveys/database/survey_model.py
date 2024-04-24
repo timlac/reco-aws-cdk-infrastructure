@@ -11,6 +11,7 @@ class SurveyItemModel(BaseModel):
     reply: list[Any]
     time_spent_on_item: Optional[int] = None
     video_duration: Optional[int] = None
+    last_modified: Optional[str] = None
     metadata: Dict[str, Any] = {}
 
 
@@ -23,13 +24,15 @@ class SurveyModel(BaseModel):
     created_at: str
     user_id: str
     valence: Optional[str] = None
-    date_of_birth: str
-    sex: str
+    date_of_birth: Optional[str] = None
+    sex: Optional[str] = None
+    consent: bool
     # the emotion alternatives included in the survey items
     emotion_ids: list[int]
     survey_items: list[SurveyItemModel]
 
     progress: Optional[float] = None
+    last_modified: Optional[str] = None
 
     def __init__(self, **data):
         if 'created_at' not in data:
