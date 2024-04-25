@@ -123,6 +123,18 @@ class EmotionDataStack(Stack):
         put_reply = lambda_.Function(
             self, "PutReply",
             runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="surveys.update_survey_item.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": survey_table.table_name
+            },
+            memory_size=1024,
+            layers=[layer]
+        )
+
+        update_survey = lambda_.Function(
+            self, "updateSurvey",
+            runtime=lambda_.Runtime.PYTHON_3_10,
             handler="surveys.update_survey.handler",
             code=lambda_.Code.from_asset("lambda"),
             environment={
@@ -207,6 +219,7 @@ class EmotionDataStack(Stack):
         survey_table.grant_read_data(get_surveys_lambda)
         survey_table.grant_read_data(get_specific_survey_lambda)
         survey_table.grant_read_write_data(put_reply)
+        survey_table.grant_read_write_data(update_survey)
 
         project_table.grant_read_data(get_specific_survey_lambda)
         project_table.grant_read_data(create_survey_lambda)
@@ -256,6 +269,7 @@ class EmotionDataStack(Stack):
         # survey front-end
         specific_survey.add_method("GET", apigateway.LambdaIntegration(get_specific_survey_lambda))
         specific_survey.add_method("PUT", apigateway.LambdaIntegration(put_reply))
+        specific_survey.add_method("POST", apigateway.LambdaIntegration(update_survey))
 
         # template routes
         templates = api.root.add_resource("templates")
@@ -277,7 +291,7 @@ class EmotionDataStack(Stack):
                                  )
 
         # Api Deployment
-        api_deployment = apigateway.Deployment(self, "APIDeployment20240408_1", api=api)
+        api_deployment = apigateway.Deployment(self, "APIDeployment20240425", api=api)
         api_stage = apigateway.Stage(self, f"{env}", deployment=api_deployment, stage_name=env)
 
         s3_folders = api.root.add_resource("s3_folders")

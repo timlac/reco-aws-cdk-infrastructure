@@ -26,7 +26,7 @@ class SurveyModel(BaseModel):
     valence: Optional[str] = None
     date_of_birth: Optional[str] = None
     sex: Optional[str] = None
-    consent: bool
+    consent: Optional[bool] = None
     # the emotion alternatives included in the survey items
     emotion_ids: list[int]
     survey_items: list[SurveyItemModel]

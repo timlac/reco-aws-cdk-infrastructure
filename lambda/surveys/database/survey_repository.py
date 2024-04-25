@@ -59,8 +59,8 @@ class SurveyRepository:
         else:
             return data
 
-    def update_survey(self, project_name, survey_id,
-                      update_idx, survey_item_model):
+    def update_survey_item(self, project_name, survey_id,
+                           update_idx, survey_item_model):
         """
         :param project_name: partition key to locate survey
         :param survey_id: sort key to locate survey
@@ -87,5 +87,21 @@ class SurveyRepository:
                 ':videoDuration': survey_item_model.video_duration,
                 ':itemLastModified': current_time,
                 ':surveyLastModified': current_time
+            }
+        )
+
+    def update_survey(self, survey_model):
+        self.table.update_item(
+            Key={
+                'project_name': survey_model.project_name,
+                'survey_id': survey_model.survey_id
+            },
+            UpdateExpression=f'SET sex = :sex, '
+                             f'consent = :consent,'
+                             f'date_of_birth = :date_of_birth',
+            ExpressionAttributeValues={
+                ':sex': survey_model.sex,
+                ':consent': survey_model.consent,
+                ':date_of_birth': survey_model.date_of_birth,
             }
         )
