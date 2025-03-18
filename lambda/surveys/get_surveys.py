@@ -4,18 +4,7 @@ from constants import PROJECT_NAME_KEY, TABLE_NAME_KEY
 from surveys.database.survey_model import SurveyModel
 from utils import generate_response
 from surveys.database.survey_repository import SurveyRepository
-from surveys.database.survey_item_handler import set_progress
-
-def scan_full_table(db_table, limit=None):
-    ret = []
-    resp = db_table.scan()
-    ret += resp['Items']
-
-    while 'LastEvaluatedKey' in resp:
-        resp = db_table.scan(ExclusiveStartKey=resp['LastEvaluatedKey'])
-        ret += resp['Items']
-
-    return ret
+from surveys.database.survey_item_utils import set_progress, set_total_time_spent
 
 
 def handler(event, context):
@@ -29,7 +18,8 @@ def handler(event, context):
         # setting the progress variable
         survey_models = [SurveyModel(**item) for item in response_items]
         set_progress(survey_models)
-        ret = [survey.dict() for survey in survey_models]
+        set_total_time_spent(survey_models)
+        ret = [survey.dump_without_items() for survey in survey_models]
 
         return generate_response(200, ret)
 

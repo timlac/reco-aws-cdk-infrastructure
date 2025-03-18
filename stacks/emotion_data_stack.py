@@ -146,6 +146,18 @@ class EmotionDataStack(Stack):
             layers=[layer]
         )
 
+        get_item_stats = lambda_.Function(
+            self, "getItemStats",
+            runtime=lambda_.Runtime.PYTHON_3_10,
+            handler="surveys.get_item_stats.handler",
+            code=lambda_.Code.from_asset("lambda"),
+            environment={
+                "DYNAMODB_TABLE_NAME": survey_table.table_name
+            },
+            memory_size=4096,
+            layers=[layer]
+        )
+
         create_project = lambda_.Function(self, "CreateProject",
                                           runtime=lambda_.Runtime.PYTHON_3_10,
                                           handler="projects.create_project.handler",
@@ -222,6 +234,7 @@ class EmotionDataStack(Stack):
         survey_table.grant_read_data(get_specific_survey_lambda)
         survey_table.grant_read_write_data(put_reply)
         survey_table.grant_read_write_data(update_survey)
+        survey_table.grant_read_data(get_item_stats)
 
         project_table.grant_read_data(get_specific_survey_lambda)
         project_table.grant_read_data(create_survey_lambda)
@@ -266,6 +279,12 @@ class EmotionDataStack(Stack):
                            authorization_type=apigateway.AuthorizationType.COGNITO
                            )
 
+        item_stats = surveys.add_resource("item_stats")
+        item_stats.add_method("GET", apigateway.LambdaIntegration(get_item_stats),
+                             authorizer=authorizer,
+                             authorization_type=apigateway.AuthorizationType.COGNITO
+                             )
+
         specific_survey = surveys.add_resource("{survey_id}")
 
         # survey front-end
@@ -296,5 +315,5 @@ class EmotionDataStack(Stack):
         s3_folders.add_method("GET", apigateway.LambdaIntegration(get_s3_folders))
 
         # Api Deployment
-        api_deployment = apigateway.Deployment(self, "APIDeployment20240521", api=api)
+        api_deployment = apigateway.Deployment(self, "APIDeployment20250318", api=api)
         api_stage = apigateway.Stage(self, f"{env}", deployment=api_deployment, stage_name=env)

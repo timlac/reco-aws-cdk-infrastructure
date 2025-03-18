@@ -32,6 +32,7 @@ class SurveyModel(BaseModel):
     survey_items: list[SurveyItemModel]
 
     progress: Optional[float] = None
+    total_time_spent: Optional[float] = None
     last_modified: Optional[str] = None
 
     def __init__(self, **data):
@@ -41,6 +42,6 @@ class SurveyModel(BaseModel):
 
     def dump_without_items(self):
         """Return the survey dict without `survey_items`."""
-        data = self.dump()
+        data = self.model_dump()
         data.pop("survey_items", None)  # Remove survey_items field
         return data

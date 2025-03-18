@@ -1,7 +1,7 @@
 import unittest
 import json
 
-from surveys.database.survey_item_handler import get_filename_index
+from surveys.database.survey_item_utils import get_filename_index
 from surveys.database.survey_model import SurveyItemModel
 
 

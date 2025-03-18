@@ -8,7 +8,7 @@ from constants import PROJECT_NAME_KEY, TABLE_NAME_KEY, SURVEY_ID_KEY
 
 from surveys.database.survey_repository import SurveyRepository
 
-from surveys.database.survey_item_handler import get_filename_index
+from surveys.database.survey_item_utils import get_filename_index
 
 logger = Logger()
 

@@ -2,14 +2,10 @@ import boto3
 from boto3.dynamodb.conditions import Key
 import datetime
 from zoneinfo import ZoneInfo
+
+from surveys.database.survey_item_utils import generate_meta_for_survey
 from surveys.database.survey_model import SurveyModel
 from utils import get_metadata
-
-
-def generate_meta_for_survey(survey: SurveyModel):
-    for survey_item in survey.survey_items:
-        metadata = get_metadata(survey_item.filename)
-        survey_item.metadata = metadata
 
 
 class SurveyRepository:
@@ -39,7 +35,7 @@ class SurveyRepository:
             survey_model = SurveyModel(**data)
             if generate_meta:
                 generate_meta_for_survey(survey_model)
-            return survey_model.dict()
+            return survey_model.model_dump()
         else:
             return None
 
@@ -62,7 +58,7 @@ class SurveyRepository:
                 survey_model = SurveyModel(**d)
                 if generate_meta:
                     generate_meta_for_survey(survey_model)
-                surveys.append(survey_model.dict())
+                surveys.append(survey_model.model_dump())
             return surveys
         else:
             return data

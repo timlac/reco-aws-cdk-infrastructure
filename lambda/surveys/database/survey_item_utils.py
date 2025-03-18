@@ -1,3 +1,5 @@
+from surveys.database.survey_model import SurveyModel
+from utils import get_metadata
 
 
 def survey_item_has_reply(has_reply):
@@ -33,3 +35,24 @@ def set_progress(surveys):
         count = sum(1 for item in survey.survey_items if item.has_reply == 1)
         total = len(survey.survey_items)
         survey.progress = count / total
+
+
+def set_total_time_spent(surveys):
+    for survey in surveys:
+        MAX_TIME_SPENT_MS = 80000  # 80 seconds in milliseconds
+
+        valid_items = [
+            item for item in survey.survey_items
+            if item.has_reply == 1 and item.time_spent_on_item is not None
+        ]
+
+        capped_times = [min(item.time_spent_on_item, MAX_TIME_SPENT_MS) for item in valid_items]
+
+        survey.total_time_spent = sum(capped_times)
+
+
+def generate_meta_for_survey(survey: SurveyModel):
+    for survey_item in survey.survey_items:
+        metadata = get_metadata(survey_item.filename)
+        survey_item.metadata = metadata
+
