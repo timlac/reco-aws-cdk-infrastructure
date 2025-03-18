@@ -155,7 +155,8 @@ class EmotionDataStack(Stack):
                 "DYNAMODB_TABLE_NAME": survey_table.table_name
             },
             memory_size=4096,
-            layers=[layer]
+            layers=[layer],
+            timeout=Duration.seconds(10)
         )
 
         create_project = lambda_.Function(self, "CreateProject",
