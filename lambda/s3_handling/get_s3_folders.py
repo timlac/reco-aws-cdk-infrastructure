@@ -11,6 +11,8 @@ def handler(event, context):
         all_objects = list_all_bucket_contents(bucket_name)
 
         folder_dict = create_folder_dict(all_objects)
+        print(folder_dict)
+
         add_metadata(folder_dict)
 
         return generate_response(200, folder_dict)

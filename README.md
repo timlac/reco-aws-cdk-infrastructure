@@ -1,4 +1,13 @@
 
+# Recordix aws-cdk infrastructure   
+
+## Improvements
+
+- Different chapters. 
+- Randomization of items smaller than complete set.
+- 
+
+
 # Welcome to your CDK Python project!
 
 This is a blank project for CDK development with Python.

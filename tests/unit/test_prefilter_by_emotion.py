@@ -3,6 +3,7 @@ import unittest
 import json
 from collections import Counter
 
+from surveys.database.survey_model import SurveyModel
 from surveys.filename_sampling.frequency_2_filename import generate_frequency_2_filename, generate_filename2freq
 from surveys.filename_sampling.balanced_sampling.balanced_filename_sampling import prefilter_by_emotion
 from utils import get_emotion_id
@@ -18,9 +19,10 @@ class TestPrefilterByEmotion(unittest.TestCase):
         surveys_path = "../data/big_project/surveys.json"
         with open(surveys_path) as json_data:
             survey_data = json.load(json_data)
+            surveys = [SurveyModel(**data) for data in survey_data]
 
-        self.filename2frequency = generate_filename2freq(survey_data, project_data["s3_experiment_objects"])
-        self.frequency2filename = generate_frequency_2_filename(survey_data, project_data["s3_experiment_objects"])
+        self.filename2frequency = generate_filename2freq(surveys, project_data["s3_experiment_objects"])
+        self.frequency2filename = generate_frequency_2_filename(surveys, project_data["s3_experiment_objects"])
 
     def test_generate(self):
         emotion2filenames = prefilter_by_emotion(self.frequency2filename, set())

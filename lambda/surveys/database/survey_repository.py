@@ -48,6 +48,14 @@ class SurveyRepository:
             KeyConditionExpression=Key('project_name').eq(project_name)
         )
         data = response.get('Items', [])
+
+        while 'LastEvaluatedKey' in response:
+            response = self.table.query(
+                KeyConditionExpression=Key('project_name').eq(project_name),
+                ExclusiveStartKey=response['LastEvaluatedKey']
+            )
+            data.extend(response.get('Items', []))
+
         if data:
             surveys = []
             for d in data:

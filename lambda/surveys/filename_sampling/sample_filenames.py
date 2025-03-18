@@ -17,9 +17,6 @@ def sample_filenames(surveys, project_model, valence_parameter):
     # get all available filenames
     filenames = filter_on_valence(project_model.s3_experiment_objects, valence_parameter)
 
-    # TODO: introduce a positive parameter in survey called active, or a negative parameter called archived
-    # TODO: use this parameter to exclude inactive/archived surveys from this step
-
     # generate frequency 2 filename, a dict that describes how often filenames occur in existing surveys.
     freq2filename = generate_frequency_2_filename(surveys, filenames, project_model.days_to_deactivation)
 

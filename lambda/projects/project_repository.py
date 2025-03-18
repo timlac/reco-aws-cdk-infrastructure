@@ -4,6 +4,7 @@ from pydantic import ValidationError
 
 from projects.project_model import ProjectModel
 
+
 class ProjectRepository:
     def __init__(self, table_name):
         self.table = boto3.resource('dynamodb').Table(table_name)

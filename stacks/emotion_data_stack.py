@@ -3,7 +3,7 @@ from aws_cdk import (
     aws_dynamodb as dynamodb,
     aws_apigateway as apigateway,
     aws_lambda as lambda_,
-    aws_s3 as s3
+    aws_s3 as s3, Duration
 )
 from constructs import Construct
 from aws_cdk.aws_cognito import UserPool
@@ -91,7 +91,8 @@ class EmotionDataStack(Stack):
                 "SURVEY_TABLE_NAME": survey_table.table_name,
                 "PROJECT_TABLE_NAME": project_table.table_name
             },
-            memory_size=2048,
+            memory_size=4096,
+            timeout=Duration.seconds(6),
             layers=[layer]
         )
 
@@ -104,6 +105,7 @@ class EmotionDataStack(Stack):
                 "DYNAMODB_TABLE_NAME": survey_table.table_name
             },
             memory_size=2048,
+            timeout=Duration.seconds(6),
             layers=[layer]
         )
 
@@ -290,10 +292,9 @@ class EmotionDataStack(Stack):
                                  authorization_type=apigateway.AuthorizationType.COGNITO
                                  )
 
-        # Api Deployment
-        api_deployment = apigateway.Deployment(self, "APIDeployment20240425", api=api)
-        api_stage = apigateway.Stage(self, f"{env}", deployment=api_deployment, stage_name=env)
-
         s3_folders = api.root.add_resource("s3_folders")
-
         s3_folders.add_method("GET", apigateway.LambdaIntegration(get_s3_folders))
+
+        # Api Deployment
+        api_deployment = apigateway.Deployment(self, "APIDeployment20240521", api=api)
+        api_stage = apigateway.Stage(self, f"{env}", deployment=api_deployment, stage_name=env)

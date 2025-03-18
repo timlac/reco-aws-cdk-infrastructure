@@ -38,3 +38,9 @@ class SurveyModel(BaseModel):
         if 'created_at' not in data:
             data['created_at'] = str(datetime.datetime.now(ZoneInfo("Europe/Berlin")).isoformat())
         super().__init__(**data)
+
+    def dump_without_items(self):
+        """Return the survey dict without `survey_items`."""
+        data = self.dump()
+        data.pop("survey_items", None)  # Remove survey_items field
+        return data
