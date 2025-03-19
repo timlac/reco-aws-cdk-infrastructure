@@ -16,11 +16,12 @@ def get_reply_stats(survey_models):
     emotion_reply_count = defaultdict(int)
 
     for survey in survey_models:
-        for item in survey.survey_items:
-            if item.has_reply:
-                item_reply_count[item.filename] += 1
-                emotion_id = get_emotion_id(item.filename)  # 🚨 Possible slowdown
-                emotion_reply_count[emotion_id] += 1
+        if survey.progress == 1:
+            for item in survey.survey_items:
+                if item.has_reply:
+                    item_reply_count[item.filename] += 1
+                    emotion_id = get_emotion_id(item.filename)
+                    emotion_reply_count[emotion_id] += 1
 
     elapsed_time = time.time() - start_time
     print(f"[DEBUG] get_reply_stats execution time: {elapsed_time:.4f} sec")
@@ -45,6 +46,8 @@ def handler(event, context):
     survey_models = [SurveyModel(**item) for item in response_items]
     model_elapsed = time.time() - model_start
     print(f"[DEBUG] SurveyModel instantiation time: {model_elapsed:.4f} sec")
+
+    set_progress(survey_models)
 
     # 🚀 Measure stats computation time
     stats_start = time.time()

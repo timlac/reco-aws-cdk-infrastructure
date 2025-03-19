@@ -8,6 +8,8 @@ from zoneinfo import ZoneInfo
 from dateutil import parser
 from datetime import datetime, timedelta, timezone
 import dateutil
+import gzip
+import base64
 
 from nexa_sentimotion_filename_parser.metadata import Metadata
 from nexa_py_sentimotion_mapper.sentimotion_mapper import Mapper
@@ -39,15 +41,50 @@ def to_serializable(val):
     return val
 
 
-def generate_response(status_code, body):
-    return {
-        'statusCode': status_code,
-        'headers': {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Credentials': True
-        },
-        'body': json.dumps(body, default=to_serializable)
-    }
+# def generate_response(status_code, body):
+#     return {
+#         'statusCode': status_code,
+#         'headers': {
+#             'Access-Control-Allow-Origin': '*',
+#             'Access-Control-Allow-Credentials': True
+#         },
+#         'body': json.dumps(body, default=to_serializable)
+#     }
+
+
+def generate_response(status_code, body, compressed=False):
+    """
+    Generate API Gateway response.
+    If `compressed=True`, the body is gzipped and base64-encoded.
+    """
+    if compressed:
+        # Compress and Base64-encode the JSON body
+        json_data = json.dumps(body, default=to_serializable)
+        compressed_data = gzip.compress(json_data.encode("utf-8"))
+        encoded_data = base64.b64encode(compressed_data).decode("utf-8")
+
+        return {
+            'statusCode': status_code,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True,
+                'Content-Encoding': 'gzip',
+                'Content-Type': 'application/json'
+            },
+            'body': encoded_data,
+            'isBase64Encoded': True  # Important for API Gateway to decode correctly
+        }
+
+    else:
+        # Normal JSON response
+        return {
+            'statusCode': status_code,
+            'headers': {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Credentials': True
+            },
+            'body': json.dumps(body, default=to_serializable)
+        }
 
 
 def generate_id():

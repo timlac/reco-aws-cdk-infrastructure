@@ -68,6 +68,10 @@ Enjoy!
 
 ## Building the stacks
 
+`nvm use 20`
+`export AWS_PROFILE=rackspaceAcc`
+
+
 CognitoStack:
 
 ```
